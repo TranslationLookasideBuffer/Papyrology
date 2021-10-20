@@ -1,3 +1,4 @@
+*.antlr
 *.class
 *.log
 *.jar
