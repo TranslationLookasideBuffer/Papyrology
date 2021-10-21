@@ -1,71 +1,58 @@
 grammar Papyrus
     ;
 
-script: NEWLINE* header (DOC_COMMENT NEWLINE)? script_statement*;
+script: LINE_END* header script_line*;
 
-header: K_SCRIPT_NAME ID (K_EXTENDS ID)? script_flag* NEWLINE;
+header: K_SCRIPT_NAME ID (K_EXTENDS ID)? flag = (F_HIDDEN | F_CONDITIONAL)* LINE_END_DOC_COMMENT;
 
-script_flag: F_HIDDEN | F_CONDITIONAL;
-
-script_statement: import_statement | script_variable_statement | property_statement | state | function | event;
-
-import_statement: K_IMPORT ID NEWLINE;
-
-script_variable_statement: type ID ('=' literal) variable_flag* NEWLINE;
-
-variable_flag: F_CONDITIONAL;
-
-type: K_INT | K_BOOL | K_FLOAT | K_STRING | ID;
-
-literal: L_BOOL | L_FLOAT | L_INT | L_STRING | L_NONE;
-
-property_statement
-    : type K_PROPERTY ID F_HIDDEN? NEWLINE property_function property_function? K_END_PROPERTY NEWLINE # Full
-    | type K_PROPERTY ID ('=' literal)? K_AUTO F_HIDDEN? NEWLINE                                       # Auto
-    | type K_PROPERTY ID '=' literal K_AUTO_READ_ONLY F_HIDDEN? NEWLINE                                # AutoReadOnly
-    | type K_PROPERTY ID '=' literal (K_AUTO | K_AUTO_READ_ONLY) F_CONDITIONAL NEWLINE                 # Conditional
+script_line:          import_declaration | variable_declaration | state_declaration | property_declaration | function_declaration | event_declaration | LINE_END;
+import_declaration:   K_IMPORT ID LINE_END;
+variable_declaration: type ID (O_ASSIGN value = literal) F_CONDITIONAL* LINE_END;
+state_declaration:    K_AUTO? K_STATE ID LINE_END (function_declaration | event_declaration)* K_END_STATE LINE_END;
+event_declaration:    K_EVENT ID '(' parameters ')' K_NATIVE? LINE_END_DOC_COMMENT (statement_block K_END_EVENT LINE_END)?;
+property_declaration
+    : type K_PROPERTY ID F_HIDDEN? LINE_END property_function property_function? K_END_PROPERTY LINE_END_DOC_COMMENT # Full
+    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO F_HIDDEN? LINE_END_DOC_COMMENT                           # Auto
+    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? LINE_END_DOC_COMMENT                    # AutoReadOnly
+    | type K_PROPERTY ID O_ASSIGN value = literal (K_AUTO | K_AUTO_READ_ONLY) F_CONDITIONAL LINE_END_DOC_COMMENT     # Conditional
     ;
 property_function
-    : type K_FUNCTION I_GET '(' ')' NEWLINE function_statement* K_END_FUNCTION NEWLINE           # Get
-    | K_FUNCTION I_SET '(' function_param ')' NEWLINE function_statement* K_END_FUNCTION NEWLINE # Set
+    : type K_FUNCTION I_GET '(' ')' LINE_END statement_block K_END_FUNCTION LINE_END      # Get
+    | K_FUNCTION I_SET '(' parameter ')' LINE_END statement_block K_END_FUNCTION LINE_END # Set
     ;
+function_declaration: type? K_FUNCTION ID '(' parameters ')' flag += (K_NATIVE | K_GLOBAL)* LINE_END_DOC_COMMENT (statement_block K_END_FUNCTION LINE_END)?;
 
-function: type? K_FUNCTION ID '(' function_params ')' function_flag* NEWLINE (function_statement* K_END_FUNCTION NEWLINE)?;
-
-function_params: function_param? (',' function_param)*;
-function_param:  type ID ('=' literal)?;
-function_flag:   K_NATIVE | K_GLOBAL;
-
-function_statement
-    : type ID ('=' expression)?                                                                                                                              # Define
-    | function_assign_value op = ('=' | '+=' | '-=' | '*=' | '/=' | '%=') expression NEWLINE                                                                 # Assign
-    | K_RETURN expression? NEWLINE                                                                                                                           # Return
-    | K_IF expression NEWLINE function_statement* (K_ELSE_IF expression NEWLINE function_statement*)? (K_ELSE NEWLINE function_statement*)? K_END_IF NEWLINE # If
-    | K_WHILE expression NEWLINE function_statement* K_END_WHILE NEWLINE                                                                                     # While
+statement_block: statement*;
+statement
+    : type ID (O_ASSIGN value = expression)? LINE_END                                                                                                # Define
+    | statement_assign_value op = O_ASSIGNMENT expression LINE_END                                                                                   # Assign
+    | K_RETURN expression? LINE_END                                                                                                                  # Return
+    | K_IF expression LINE_END statement_block (K_ELSE_IF expression LINE_END statement_block)* (K_ELSE LINE_END statement_block)? K_END_IF LINE_END # If
+    | K_WHILE expression LINE_END statement_block K_END_WHILE LINE_END                                                                               # While
+    | LINE_END                                                                                                                                       # BlankLine
     ;
-function_assign_value: ID | expression '.' ID | expression '[' expression ']';
-
+statement_assign_value: ID | expression O_DOT ID | expression '[' expression ']';
 expression
-    : ID                                                                 # ID
-    | K_NEW type '[' size = L_UINT ']'                                   # ArrayInitialize
-    | expression '[' index = expression ']'                              # ArrayAccess
-    | '(' expression ')'                                                 # Parenthetical
-    | expression '.' (K_LENGTH | ID) ('(' function_call_params ')')?     # DotOrFunctionCall
-    | expression K_AS type                                               # Cast
-    | op = ( '-' | '!') expression                                       # UnaryOp
-    | expression op = ( '*' | '/' | '%') expression                      # BinaryOp
-    | expression op = ( '+' | '-') expression                            # BinaryOp
-    | expression op = ('==' | '!=' | '>' | '>=' | '<' | '<=') expression # BinaryOp
-    | expression op = '&&' expression                                    # BinaryOp
-    | expression op = '||' expression                                    # BinaryOp
+    : ID                                                          # ID
+    | K_NEW type '[' size = L_UINT ']'                            # ArrayInitialize
+    | expression '[' index = expression ']'                       # ArrayAccess
+    | '(' expression ')'                                          # Parenthetical
+    | expression O_DOT (K_LENGTH | ID) ('(' call_parameters ')')? # DotOrFunctionCall
+    | expression K_AS type                                        # Cast
+    | op = O_UNARY value = expression                             # UnaryOp
+    | a = expression op = O_MULTIPLICATIVE b = expression         # BinaryOp
+    | a = expression op = O_ADDITIVE b = expression               # BinaryOp
+    | a = expression op = O_COMPARISON b = expression             # BinaryOp
+    | a = expression op = O_LOGICAL_AND b = expression            # BinaryOp
+    | a = expression op = O_LOGICAL_OR b = expression             # BinaryOp
     ;
+call_parameters: params += call_parameter? (',' params += call_parameter)*;
+call_parameter:  (ID O_ASSIGN)? expression;
 
-function_call_params: function_call_param? (',' function_call_param)*;
-function_call_param:  (ID '=')? expression;
-
-state: K_AUTO? K_STATE ID NEWLINE (function | event)* K_END_STATE NEWLINE;
-
-event: K_EVENT ID '(' function_params ')' K_NATIVE? NEWLINE (function_statement* K_END_EVENT NEWLINE)?;
+type:       K_INT | K_BOOL | K_FLOAT | K_STRING | ID;
+literal:    L_BOOL | L_FLOAT | L_INT | L_STRING | L_NONE;
+parameters: params += parameter? (',' params += parameter)*;
+parameter:  type ID (O_ASSIGN value = literal)?;
 
 // Handle Case-Insensitivity
 fragment A: [aA];
@@ -139,8 +126,8 @@ K_WHILE:          W H I L E;
 // Literals
 L_BOOL:   K_TRUE | K_FALSE;
 L_UINT:   DIGIT+ | '0' X HEX_DIGIT+;
-L_INT:    '-' DIGIT+ | L_UINT;
-L_FLOAT:  '-'? DIGIT+ '.' DIGIT+;
+L_INT:    O_NEGATIVE DIGIT+ | L_UINT;
+L_FLOAT:  O_NEGATIVE? DIGIT+ O_DOT DIGIT+;
 L_STRING: '"' (STRING_ESCAPE | .)? '"';
 L_NONE:   N O N E;
 
@@ -149,15 +136,47 @@ F_HIDDEN:      H I D D E N;
 F_CONDITIONAL: C O N D I T I O N A L;
 
 // Notable identifiers
-I_GET : G E T;
-I_SET : S E T;
+I_GET: G E T;
+I_SET: S E T;
 
-NEWLINE:       '\n';
-LINE_FEED:     '\r';
-LINE_BREAK:    '\\' NEWLINE -> skip; // Lines that end in "\" continue onto the next line.
-WS:            [ \t]+ -> skip;
-LINE_COMMENT:  ';' .*? NEWLINE -> skip;
-BLOCK_COMMENT: ';/' .*? '/;' -> skip;
-DOC_COMMENT:   '{' .*? '}';
+// Operators
+O_DOT:              '.';
+O_ASSIGN:           '=';
+O_ASSIGN_ADD:       '+=';
+O_ASSIGN_SUBTRACT:  '-=';
+O_ASSIGN_MULTIPLY:  '*=';
+O_ASSIGN_DIVIDE:    '/=';
+O_ASSIGN_MODULO:    '%=';
+O_NEGATIVE:         '-';
+O_LOGICAL_NOT:      '!';
+O_LOGICAL_OR:       '||';
+O_LOGICAL_AND:      '&&';
+O_MULTIPLY:         '*';
+O_DIVIDE:           '/';
+O_MODULO:           '%';
+O_ADD:              '+';
+O_SUBTRACT:         O_NEGATIVE;
+O_EQUAL:            '==';
+O_NOT_EQUAL:        '!=';
+O_GREATER:          '>';
+O_GREATER_OR_EQUAL: '>=';
+O_LESS:             '<';
+O_LESS_OR_EQUAL:    '<=';
+
+O_UNARY:          O_NEGATIVE | O_LOGICAL_NOT;
+O_MULTIPLICATIVE: O_MULTIPLY | O_DIVIDE | O_MODULO;
+O_ADDITIVE:       O_ADD | O_SUBTRACT;
+O_COMPARISON:     O_EQUAL | O_NOT_EQUAL | O_GREATER | O_GREATER_OR_EQUAL | O_LESS | O_LESS_OR_EQUAL;
+O_ASSIGNMENT:     O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO;
+
+NEWLINE:              '\n';
+LINE_FEED:            '\r' -> skip;
+LINE_BREAK:           '\\' NEWLINE -> skip; // Lines that end in "\" continue onto the next line.
+WS:                   [ \t]+ -> skip;
+LINE_COMMENT:         ';' .*? -> skip;
+BLOCK_COMMENT:        ';/' .*? '/;' -> skip;
+DOC_COMMENT:          '{' .*? '}';
+LINE_END:             LINE_COMMENT? NEWLINE;
+LINE_END_DOC_COMMENT: LINE_COMMENT? NEWLINE (DOC_COMMENT LINE_COMMENT NEWLINE)?;
 
 ID: ALPHA (ALPHA | DIGIT)*;
