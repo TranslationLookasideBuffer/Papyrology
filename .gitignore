@@ -5,6 +5,7 @@
 *.zip
 *.tar.gz
 .repo
+.ignore
 bazel
 bazel-bazel-test
 bazel-bin

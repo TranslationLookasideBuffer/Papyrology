@@ -84,7 +84,6 @@ fragment X: [xX];
 fragment Y: [yY];
 fragment Z: [zZ];
 
-fragment ALPHA:         [a-zA-Z];
 fragment DIGIT:         [0-9];
 fragment HEX_DIGIT:     DIGIT | A | B | C | D | E | F;
 fragment STRING_ESCAPE: '\\n' | '\\t' | '\\\\' | '\\"';
@@ -175,8 +174,8 @@ NEWLINE:       '\n';
 LINE_FEED:     '\r' -> skip;
 LINE_BREAK:    '\\' NEWLINE -> skip; // Lines that end in "\" continue onto the next line.
 WS:            [ \t]+ -> skip;
-LINE_COMMENT:  ';' .*? -> skip;
+LINE_COMMENT:  ';' ~[\n]* -> skip;
 BLOCK_COMMENT: ';/' .*? '/;' -> skip;
 DOC_COMMENT:   '{' .*? '}';
 
-ID: ALPHA (ALPHA | DIGIT)*;
+ID: [a-zA-Z_] ([a-zA-Z_] | DIGIT)*;
