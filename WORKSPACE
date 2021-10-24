@@ -31,7 +31,6 @@ maven_install(
         "com.google.guava:guava:31.0.1-jre",
         "com.google.truth.extensions:truth-java8-extension:1.1.3",
         "com.google.googlejavaformat:google-java-format:1.12.0",
-        "com.puppycrawl.tools:checkstyle:9.0.1",
     ],
     repositories = [
         "https://maven.google.com",

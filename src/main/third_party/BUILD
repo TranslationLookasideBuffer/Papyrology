@@ -30,23 +30,3 @@ java_library(
         "@antlr4_runtime//jar",
     ],
 )
-
-java_library(
-    name = "java_format",
-    exports = [
-        "@maven//:com_google_googlejavaformat_google_java_format",
-    ],
-)
-
-java_binary(
-    name = "java_formatter",
-    main_class = "com.google.googlejavaformat.java.Main",
-    runtime_deps = [":java_format"],
-)
-
-java_binary(
-    name = "checkstyle",
-    args = ["-c=google_checks.xml"],
-    main_class = "com.puppycrawl.tools.checkstyle.Main",
-    runtime_deps = ["@maven//:com_puppycrawl_tools_checkstyle"],
-)
