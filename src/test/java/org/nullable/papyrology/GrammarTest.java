@@ -3,8 +3,6 @@ package org.nullable.papyrology;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,9 +76,6 @@ public class GrammarTest {
         String msg,
         RecognitionException e) {
       if (e != null) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
         fail(String.format("Encountered syntax error on line %d at char %d: %s", line, charPositionInLine, e.getMessage()));
       }
     }
