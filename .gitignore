@@ -6,6 +6,7 @@
 *.tar.gz
 .repo
 .ignore
+.vscode
 bazel
 bazel-bazel-test
 bazel-bin

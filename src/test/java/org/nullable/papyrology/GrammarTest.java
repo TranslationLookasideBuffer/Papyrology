@@ -3,12 +3,14 @@ package org.nullable.papyrology;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.BitSet;
 import java.util.stream.Stream;
-import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Parser;
@@ -51,7 +53,8 @@ public class GrammarTest {
 
   @Test
   public void parse() throws IOException {
-    PapyrusLexer lexer = new PapyrusLexer(CharStreams.fromPath(path));
+    String script = new String(Files.readAllBytes(path)) + "\n";
+    PapyrusLexer lexer = new PapyrusLexer(CharStreams.fromString(script));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     PapyrusParser parser = new PapyrusParser(tokens);
     parser.addErrorListener(new ErrorListener());
@@ -65,19 +68,7 @@ public class GrammarTest {
    * A {@link BaseErrorListener} that causes the enclosing test to fail if ambiguity or a syntax
    * error is found.
    */
-  private static class ErrorListener extends BaseErrorListener {
-    @Override
-    public void reportAmbiguity(
-        Parser recognizer,
-        DFA dfa,
-        int startIndex,
-        int stopIndex,
-        boolean exact,
-        BitSet ambigAlts,
-        ATNConfigSet configs) {
-      fail("Encountered ambiguity.");
-    }
-
+  private static class ErrorListener extends DiagnosticErrorListener {
     @Override
     public void syntaxError(
         Recognizer<?, ?> recognizer,
@@ -86,7 +77,12 @@ public class GrammarTest {
         int charPositionInLine,
         String msg,
         RecognitionException e) {
-      fail("Encountered syntax error: " + msg);
+      if (e != null) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        fail(String.format("Encountered syntax error on line %d at char %d: %s", line, charPositionInLine, e.getMessage()));
+      }
     }
   }
 
