@@ -5,32 +5,24 @@ script: line_end* header script_line* EOF;
 
 header: K_SCRIPT_NAME ID (K_EXTENDS ID)? flag = (F_HIDDEN | F_CONDITIONAL)* line_end_doc_comment;
 
-script_line
-    : import_declaration
-    | variable_declaration
-    | state_declaration
-    | property_declaration
-    | function_declaration
-    | event_declaration
-    | line_end
-    ;
+script_line:          import_declaration | variable_declaration | state_declaration | property_declaration | function_declaration | event_declaration | line_end;
 import_declaration:   K_IMPORT ID line_end;
 variable_declaration: type ID (O_ASSIGN value = literal)? F_CONDITIONAL* line_end;
 state_declaration:    K_AUTO? K_STATE ID line_end (function_declaration | event_declaration | line_end)* K_END_STATE line_end;
 event_declaration:    K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? line_end_doc_comment (statement_block K_END_EVENT line_end)?;
 property_declaration
     : type K_PROPERTY ID F_HIDDEN? line_end_doc_comment line_end* property_function line_end* property_function? line_end* K_END_PROPERTY line_end # Full
-    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* line_end_doc_comment         # Auto
-    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? line_end_doc_comment                    # AutoReadOnly
-    | type K_PROPERTY ID O_ASSIGN value = literal (K_AUTO | K_AUTO_READ_ONLY) F_CONDITIONAL line_end_doc_comment     # Conditional
+    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* line_end_doc_comment                                       # Auto
+    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? line_end_doc_comment                                                  # AutoReadOnly
+    | type K_PROPERTY ID O_ASSIGN value = literal (K_AUTO | K_AUTO_READ_ONLY) F_CONDITIONAL line_end_doc_comment                                   # Conditional
     ;
 property_function
-    : type K_FUNCTION I_GET S_LPAREN S_RPAREN line_end statement_block K_END_FUNCTION line_end      # Get
-    | K_FUNCTION I_SET S_LPAREN parameter S_RPAREN line_end statement_block K_END_FUNCTION line_end # Set
+    : type K_FUNCTION ID S_LPAREN S_RPAREN line_end statement_block K_END_FUNCTION line_end      # Get
+    | K_FUNCTION ID S_LPAREN parameter S_RPAREN line_end statement_block K_END_FUNCTION line_end # Set
     ;
 function_declaration
     : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? line_end_doc_comment statement_block K_END_FUNCTION line_end
-    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_NATIVE flag += K_GLOBAL? line_end_doc_comment
+    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? line_end_doc_comment
     ;
 
 statement_block: statement*;
@@ -63,12 +55,12 @@ expression
 call_parameters: params += call_parameter? (S_COMMA params += call_parameter)*;
 call_parameter:  (ID O_ASSIGN)? expression;
 
-type:                         (K_INT | K_BOOL | K_FLOAT | K_STRING | ID) (S_LBRAKET S_RBRAKET)?;
-literal:                      K_TRUE | K_FALSE | L_FLOAT | L_UINT | L_INT | L_STRING | K_NONE | K_SELF | K_PARENT;
-parameters:                   params += parameter? (S_COMMA params += parameter)*;
-parameter:                    type ID (O_ASSIGN value = literal)?;
-line_end:                     LINE_COMMENT? NEWLINE;
-line_end_doc_comment:         (LINE_COMMENT? NEWLINE)+ (DOC_COMMENT LINE_COMMENT? NEWLINE)?;
+type:                 (K_INT | K_BOOL | K_FLOAT | K_STRING | ID) (S_LBRAKET S_RBRAKET)?;
+literal:              K_TRUE | K_FALSE | L_FLOAT | L_UINT | L_INT | L_STRING | K_NONE | K_SELF | K_PARENT;
+parameters:           params += parameter? (S_COMMA params += parameter)*;
+parameter:            type ID (O_ASSIGN value = literal)?;
+line_end:             LINE_COMMENT? NEWLINE;
+line_end_doc_comment: (LINE_COMMENT? NEWLINE)+ (DOC_COMMENT LINE_COMMENT? NEWLINE)?;
 
 // Handle Case-Insensitivity
 fragment A: [aA];
@@ -156,10 +148,6 @@ L_STRING: '"' (STRING_ESCAPE | .)*? '"';
 // Flags (that are not also keywords)
 F_HIDDEN:      H I D D E N;
 F_CONDITIONAL: C O N D I T I O N A L;
-
-// Notable identifiers
-I_GET: G E T;
-I_SET: S E T;
 
 // Operators
 O_DOT:              '.';
