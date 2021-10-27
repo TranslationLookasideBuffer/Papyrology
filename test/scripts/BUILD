@@ -1,4 +1,4 @@
-package(default_visibility = ["//src/test:__subpackages__"])
+package(default_visibility = ["//:__subpackages__"])
 
 filegroup(
     name = "scripts",

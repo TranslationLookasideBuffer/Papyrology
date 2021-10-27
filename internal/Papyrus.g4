@@ -7,27 +7,27 @@ header: K_SCRIPT_NAME ID (K_EXTENDS ID)? flag = (F_HIDDEN | F_CONDITIONAL)* doc_
 
 script_line:          import_declaration | variable_declaration | state_declaration | property_declaration | function_declaration | event_declaration | NEWLINE;
 import_declaration:   K_IMPORT ID NEWLINE;
-variable_declaration: type ID (O_ASSIGN value = literal)? F_CONDITIONAL* NEWLINE;
+variable_declaration: typedef ID (O_ASSIGN value = literal)? F_CONDITIONAL* NEWLINE;
 state_declaration:    K_AUTO? K_STATE ID NEWLINE (function_declaration | event_declaration | NEWLINE)* K_END_STATE NEWLINE;
 event_declaration:    K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? doc_comment (statement_block K_END_EVENT NEWLINE)?;
 property_declaration
-    : type K_PROPERTY ID F_HIDDEN? doc_comment NEWLINE* property_function NEWLINE* property_function? NEWLINE* K_END_PROPERTY NEWLINE # Full
-    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* doc_comment                                   # Auto
-    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? doc_comment                                              # AutoReadOnly
-    | type K_PROPERTY ID O_ASSIGN value = literal (K_AUTO | K_AUTO_READ_ONLY) F_CONDITIONAL doc_comment                               # Conditional
+    : typedef K_PROPERTY ID F_HIDDEN? doc_comment NEWLINE* property_function NEWLINE* property_function? NEWLINE* K_END_PROPERTY NEWLINE # Full
+    | typedef K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* doc_comment                                   # Auto
+    | typedef K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? doc_comment                                              # AutoReadOnly
+    | typedef K_PROPERTY ID O_ASSIGN value = literal (K_AUTO | K_AUTO_READ_ONLY) F_CONDITIONAL doc_comment                               # Conditional
     ;
 property_function
-    : type K_FUNCTION ID S_LPAREN S_RPAREN NEWLINE statement_block K_END_FUNCTION NEWLINE      # Get
+    : typedef K_FUNCTION ID S_LPAREN S_RPAREN NEWLINE statement_block K_END_FUNCTION NEWLINE      # Get
     | K_FUNCTION ID S_LPAREN parameter S_RPAREN NEWLINE statement_block K_END_FUNCTION NEWLINE # Set
     ;
 function_declaration
-    : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? doc_comment statement_block K_END_FUNCTION NEWLINE
-    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? doc_comment
+    : typedef? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? doc_comment statement_block K_END_FUNCTION NEWLINE
+    | typedef? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? doc_comment
     ;
 
 statement_block: statement*;
 statement
-    : type ID (O_ASSIGN value = expression)? NEWLINE                                                                                                       # Define
+    : typedef ID (O_ASSIGN value = expression)? NEWLINE                                                                                                       # Define
     | statement_assign_value op = (O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO) expression NEWLINE # Assign
     | K_RETURN expression? NEWLINE                                                                                                                         # Return
     | K_IF expression NEWLINE statement_block (K_ELSE_IF expression NEWLINE statement_block)* (K_ELSE NEWLINE statement_block)? K_END_IF NEWLINE           # If
@@ -43,22 +43,22 @@ expression
     | a = expression op = (O_ADD | O_SUBTRACT) b = expression                                                                # BinaryOp
     | a = expression op = (O_MULTIPLY | O_DIVIDE | O_MODULO) b = expression                                                  # BinaryOp
     | op = (O_SUBTRACT | O_LOGICAL_NOT) value = expression                                                                   # UnaryOp
-    | expression K_AS type                                                                                                   # Cast
+    | expression K_AS typedef                                                                                                   # Cast
     | ID S_LPAREN call_parameters S_RPAREN                                                                                   # LocalFunctionCall
     | expression O_DOT (K_LENGTH | ID) (S_LPAREN call_parameters S_RPAREN)?                                                  # DotOrFunctionCall
     | S_LPAREN expression S_RPAREN                                                                                           # Parenthetical
     | expression S_LBRAKET index = expression S_RBRAKET                                                                      # ArrayAccess
-    | K_NEW type S_LBRAKET size = L_UINT S_RBRAKET                                                                           # ArrayInitialize
+    | K_NEW typedef S_LBRAKET size = L_UINT S_RBRAKET                                                                           # ArrayInitialize
     | literal                                                                                                                # LiteralValue
     | ID                                                                                                                     # ID
     ;
 call_parameters: params += call_parameter? (S_COMMA params += call_parameter)*;
 call_parameter:  (ID O_ASSIGN)? expression;
 
-type:        (K_INT | K_BOOL | K_FLOAT | K_STRING | ID) (S_LBRAKET S_RBRAKET)?;
+typedef:        (K_INT | K_BOOL | K_FLOAT | K_STRING | ID) (S_LBRAKET S_RBRAKET)?;
 literal:     K_TRUE | K_FALSE | L_FLOAT | L_UINT | L_INT | L_STRING | K_NONE | K_SELF | K_PARENT;
 parameters:  params += parameter? (S_COMMA params += parameter)*;
-parameter:   type ID (O_ASSIGN value = literal)?;
+parameter:   typedef ID (O_ASSIGN value = literal)?;
 doc_comment: NEWLINE+ (DOC_COMMENT NEWLINE)?;
 
 // Handle Case-Insensitivity
