@@ -3,9 +3,7 @@ package(default_visibility = ["//visibility:public"])
 java_library(
     name = "junit",
     testonly = True,
-    exports = [
-        "@maven//:junit_junit",
-    ],
+    exports = ["@maven//:junit_junit"],
 )
 
 java_library(
@@ -17,16 +15,46 @@ java_library(
     ],
 )
 
+java_plugin(
+    name = "autovalue_plugin",
+    visibility = ["//visibility:private"],
+    processor_class = "com.google.auto.value.processor.AutoValueProcessor",
+    deps = ["@maven//:com_google_auto_value_auto_value"],
+)
+
+java_plugin(
+    name = "autooneof_plugin",
+    visibility = ["//visibility:private"],
+    processor_class = "com.google.auto.value.processor.AutoOneOfProcessor",
+    deps = ["@maven//:com_google_auto_value_auto_value"],
+)
+
+java_library(
+    name = "autovalue",
+    exported_plugins = [
+        ":autovalue_plugin",
+        ":autooneof_plugin",
+    ],
+    neverlink = True,
+    exports = ["@maven//:com_google_auto_value_auto_value"],
+)
+
+java_library(
+    name = "autovalue_annotations",
+    exports = ["@maven//:com_google_auto_value_auto_value_annotations"],
+)
+
+java_library(
+    name = "errorprone",
+    exports = ["@maven//:com_google_errorprone_error_prone_annotations"],
+)
+
 java_library(
     name = "guava",
-    exports = [
-        "@maven//:com_google_guava_guava",
-    ],
+    exports = ["@maven//:com_google_guava_guava"],
 )
 
 java_library(
     name = "antlr",
-    exports = [
-        "@antlr4_runtime//jar",
-    ],
+    exports = ["@antlr4_runtime//jar"],
 )
