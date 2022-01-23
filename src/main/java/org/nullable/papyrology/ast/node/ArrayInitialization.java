@@ -1,6 +1,5 @@
 package org.nullable.papyrology.ast.node;
 
-
 import com.google.auto.value.AutoValue;
 
 /** An expression that evaluates to a newly initialized array. */

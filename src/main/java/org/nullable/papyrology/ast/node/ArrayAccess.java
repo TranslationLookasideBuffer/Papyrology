@@ -1,6 +1,5 @@
 package org.nullable.papyrology.ast.node;
 
-
 import com.google.auto.value.AutoValue;
 
 /** An {@link Expression} that evaluates to an element in an array. */
