@@ -1,4 +1,4 @@
-package org.nullable.papyrology;
+package org.nullable.papyrology.grammar;
 
 import static org.junit.Assert.fail;
 
@@ -6,23 +6,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.BitSet;
 import java.util.stream.Stream;
-import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.DiagnosticErrorListener;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
-import org.antlr.v4.runtime.atn.ATNConfigSet;
-import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.junit.Test;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -48,6 +45,11 @@ public class GrammarTest {
 
   @Parameter(0)
   public Path path;
+
+  @Before
+  public void mark() {
+    System.out.printf("Parsing: %s\n", path);
+  }
 
   @Test
   public void parse() throws IOException {
@@ -76,7 +78,10 @@ public class GrammarTest {
         String msg,
         RecognitionException e) {
       if (e != null) {
-        fail(String.format("Encountered syntax error on line %d at char %d: %s", line, charPositionInLine, e.getMessage()));
+        fail(
+            String.format(
+                "Encountered syntax error on line %d at char %d: %s",
+                line, charPositionInLine, e.getMessage()));
       }
     }
   }

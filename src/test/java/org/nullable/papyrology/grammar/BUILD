@@ -5,7 +5,7 @@ java_test(
         "//src/test/scripts",
     ],
     deps = [
-        "//src/main/papyrology:papyrus",
+        "//src/main/java/org/nullable/papyrology/grammar",
         "//src/main/third_party:antlr",
         "//src/main/third_party:guava",
         "//src/main/third_party:junit",

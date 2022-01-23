@@ -3,31 +3,33 @@ grammar Papyrus
 
 script: NEWLINE* header script_line* EOF;
 
-header: K_SCRIPT_NAME ID (K_EXTENDS ID)? flag = (F_HIDDEN | F_CONDITIONAL)* doc_comment;
+header: K_SCRIPT_NAME ID (K_EXTENDS ID)? flag = (F_HIDDEN | F_CONDITIONAL)* doc_comment? NEWLINE;
 
 script_line:          import_declaration | variable_declaration | state_declaration | property_declaration | function_declaration | event_declaration | NEWLINE;
 import_declaration:   K_IMPORT ID NEWLINE;
 variable_declaration: type ID (O_ASSIGN value = literal)? F_CONDITIONAL* NEWLINE;
 state_declaration:    K_AUTO? K_STATE ID NEWLINE (function_declaration | event_declaration | NEWLINE)* K_END_STATE NEWLINE;
-event_declaration:    K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? doc_comment (statement_block K_END_EVENT NEWLINE)?;
+event_declaration
+    : K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? doc_comment? statement_block K_END_EVENT NEWLINE # Event
+    | K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE doc_comment? NEWLINE                              # NativeEvent
+    ;
 property_declaration
-    : type K_PROPERTY ID F_HIDDEN? doc_comment NEWLINE* property_function NEWLINE* property_function? NEWLINE* K_END_PROPERTY NEWLINE # Full
-    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* doc_comment                                   # Auto
-    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? doc_comment                                              # AutoReadOnly
-    | type K_PROPERTY ID O_ASSIGN value = literal (K_AUTO | K_AUTO_READ_ONLY) F_CONDITIONAL doc_comment                               # Conditional
+    : type K_PROPERTY ID F_HIDDEN? doc_comment? NEWLINE+ property_function NEWLINE* property_function? NEWLINE* K_END_PROPERTY NEWLINE # FullProperty
+    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* doc_comment? NEWLINE                           # AutoProperty
+    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? doc_comment? NEWLINE                                      # AutoReadOnlyProperty
     ;
 property_function
-    : type K_FUNCTION ID S_LPAREN S_RPAREN NEWLINE statement_block K_END_FUNCTION NEWLINE      # Get
-    | K_FUNCTION ID S_LPAREN parameter S_RPAREN NEWLINE statement_block K_END_FUNCTION NEWLINE # Set
+    : type K_FUNCTION ID S_LPAREN S_RPAREN NEWLINE doc_comment? statement_block K_END_FUNCTION NEWLINE      # GetPropertyFunction
+    | K_FUNCTION ID S_LPAREN parameter S_RPAREN NEWLINE doc_comment? statement_block K_END_FUNCTION NEWLINE # SetPropertyFunction
     ;
 function_declaration
-    : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? doc_comment statement_block K_END_FUNCTION NEWLINE
-    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? doc_comment
+    : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? doc_comment? statement_block K_END_FUNCTION NEWLINE     # Function
+    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? doc_comment? NEWLINE # NativeFunction
     ;
 
 statement_block: statement*;
 statement
-    : type ID (O_ASSIGN value = expression)? NEWLINE                                                                                                       # Define
+    : type ID (O_ASSIGN value = expression)? NEWLINE                                                                                                       # DefineLocal
     | statement_assign_value op = (O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO) expression NEWLINE # Assign
     | K_RETURN expression? NEWLINE                                                                                                                         # Return
     | K_IF expression NEWLINE statement_block (K_ELSE_IF expression NEWLINE statement_block)* (K_ELSE NEWLINE statement_block)? K_END_IF NEWLINE           # If
@@ -59,7 +61,7 @@ type:        (K_INT | K_BOOL | K_FLOAT | K_STRING | ID) (S_LBRAKET S_RBRAKET)?;
 literal:     K_TRUE | K_FALSE | L_FLOAT | L_UINT | L_INT | L_STRING | K_NONE | K_SELF | K_PARENT;
 parameters:  params += parameter? (S_COMMA params += parameter)*;
 parameter:   type ID (O_ASSIGN value = literal)?;
-doc_comment: NEWLINE+ (DOC_COMMENT NEWLINE)?;
+doc_comment: NEWLINE* DOC_COMMENT;
 
 // Handle Case-Insensitivity
 fragment A: [aA];
@@ -171,12 +173,11 @@ O_GREATER_OR_EQUAL: '>=';
 O_LESS:             '<';
 O_LESS_OR_EQUAL:    '<=';
 
-
 LINE_BREAK:    '\\' [ \t]* '\r'? '\n' -> skip; // Lines that end in "\" continue onto the next line.
 WS:            [ \t]+ -> skip;
 LINE_COMMENT:  ';' ~[\n]* -> skip;
 BLOCK_COMMENT: ';/' .*? '/;' -> skip;
 
-NEWLINE:       '\r'? '\n';
-DOC_COMMENT:   S_LCURLY .*? S_RCURLY;
-ID: [a-zA-Z_] ([a-zA-Z_] | DIGIT)*;
+NEWLINE:     '\r'? '\n';
+DOC_COMMENT: S_LCURLY .*? S_RCURLY;
+ID:          [a-zA-Z_] ([a-zA-Z_] | DIGIT)*;
