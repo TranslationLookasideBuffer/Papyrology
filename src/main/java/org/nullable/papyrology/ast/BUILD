@@ -6,5 +6,7 @@ java_library(
     deps = [
       "//src/main/java/org/nullable/papyrology/ast/node",
       "//src/main/java/org/nullable/papyrology/grammar",
+      "//src/main/third_party:antlr",
+      "//src/main/third_party:guava",
     ],
 )

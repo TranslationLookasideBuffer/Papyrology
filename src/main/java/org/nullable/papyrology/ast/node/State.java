@@ -20,19 +20,19 @@ public abstract class State implements Declaration {
   public abstract boolean isAuto();
 
   /** Returns a fresh {@code State} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_State.Builder();
   }
 
   /** A builder of {@code States}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setIdentifier(Identifier id);
+  public abstract static class Builder {
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setInvokables(ImmutableList<Invokable> invokables);
+    public abstract Builder setInvokables(ImmutableList<Invokable> invokables);
 
-    abstract Builder setAuto(boolean isAuto);
+    public abstract Builder setAuto(boolean isAuto);
 
-    abstract State build();
+    public abstract State build();
   }
 }

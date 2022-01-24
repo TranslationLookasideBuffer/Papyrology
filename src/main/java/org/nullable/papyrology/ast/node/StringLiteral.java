@@ -10,15 +10,15 @@ public abstract class StringLiteral implements Literal {
   public abstract String getValue();
 
   /** Returns a fresh {@code StringLiteral} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_StringLiteral.Builder();
   }
 
   /** A builder of {@code StringLiterals}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setValue(String value);
+  public abstract static class Builder {
+    public abstract Builder setValue(String value);
 
-    abstract StringLiteral build();
+    public abstract StringLiteral build();
   }
 }

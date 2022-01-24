@@ -12,15 +12,15 @@ public abstract class Import implements Declaration {
   public abstract Identifier getImportedScriptIdentifier();
 
   /** Returns a fresh {@code Import} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Import.Builder();
   }
 
   /** A builder of {@code Imports}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setImportedScriptIdentifier(Identifier id);
+  public abstract static class Builder {
+    public abstract Builder setImportedScriptIdentifier(Identifier id);
 
-    abstract Import build();
+    public abstract Import build();
   }
 }

@@ -36,30 +36,30 @@ public abstract class Function implements Invokable {
   public abstract boolean isNative();
 
   /** Returns a fresh {@code Function} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Function.Builder();
   }
 
   /** A builder of {@code Functions}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setReturnType(Type type);
+  public abstract static class Builder {
+    public abstract Builder setReturnType(Type type);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setParameters(ImmutableList<Parameter> parameters);
+    public abstract Builder setParameters(ImmutableList<Parameter> parameters);
 
-    abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
+    public abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
 
-    abstract Builder setComment(String comment);
+    public abstract Builder setComment(String comment);
 
-    abstract Builder setGlobal(boolean isGlobal);
+    public abstract Builder setGlobal(boolean isGlobal);
 
-    abstract Builder setNative(boolean isNative);
+    public abstract Builder setNative(boolean isNative);
 
     abstract Function autoBuild();
 
-    final Function build() {
+    public final Function build() {
       Function function = autoBuild();
       checkState(
           !function.isNative() || function.getBodyStatements().isEmpty(),

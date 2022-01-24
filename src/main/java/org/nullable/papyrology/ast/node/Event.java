@@ -30,26 +30,26 @@ public abstract class Event implements Invokable {
   public abstract boolean isNative();
 
   /** Returns a fresh {@code Event} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Event.Builder();
   }
 
   /** A builder of {@code Events}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setIdentifier(Identifier id);
+  public abstract static class Builder {
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setParameters(ImmutableList<Parameter> parameters);
+    public abstract Builder setParameters(ImmutableList<Parameter> parameters);
 
-    abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
+    public abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
 
-    abstract Builder setComment(String comment);
+    public abstract Builder setComment(String comment);
 
-    abstract Builder setNative(boolean isNative);
+    public abstract Builder setNative(boolean isNative);
 
     abstract Event autoBuild();
 
-    final Event build() {
+    public final Event build() {
       Event event = autoBuild();
       checkState(
           !event.isNative() || event.getBodyStatements().isEmpty(),

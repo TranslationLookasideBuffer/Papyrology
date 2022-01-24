@@ -14,17 +14,17 @@ public abstract class While implements Statement {
   public abstract ImmutableList<Statement> getBodyStatements();
 
   /** Returns a fresh {@code While} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_While.Builder();
   }
 
   /** A builder of {@code Whiles}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setConditionalExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setConditionalExpression(Expression expression);
 
-    abstract Builder setBodyStatements(ImmutableList<Statement> statements);
+    public abstract Builder setBodyStatements(ImmutableList<Statement> statements);
 
-    abstract While build();
+    public abstract While build();
   }
 }

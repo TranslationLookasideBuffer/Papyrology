@@ -10,15 +10,15 @@ public abstract class Parenthetical implements Expression {
   public abstract Expression getExpression();
 
   /** Returns a fresh {@code Parenthetical} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Parenthetical.Builder();
   }
 
   /** A builder of {@code Parentheticals}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setExpression(Expression expression);
 
-    abstract Parenthetical build();
+    public abstract Parenthetical build();
   }
 }

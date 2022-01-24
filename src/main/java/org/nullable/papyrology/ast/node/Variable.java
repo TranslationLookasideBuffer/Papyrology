@@ -17,19 +17,19 @@ public abstract class Variable implements Statement {
   public abstract Optional<Expression> getValueExpression();
 
   /** Returns a fresh {@code Variable} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Variable.Builder();
   }
 
   /** A builder of {@code Variables}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setType(Type type);
+  public abstract static class Builder {
+    public abstract Builder setType(Type type);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setValueExpression(Expression expression);
+    public abstract Builder setValueExpression(Expression expression);
 
-    abstract Variable build();
+    public abstract Variable build();
   }
 }

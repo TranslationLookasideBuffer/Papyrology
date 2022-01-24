@@ -26,23 +26,23 @@ public abstract class Header implements Construct {
   public abstract Optional<String> getScriptComment();
 
   /** Returns a fresh {@code Header} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Header.Builder();
   }
 
   /** A builder of {@code Headers}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setScriptIdentifier(Identifier id);
+  public abstract static class Builder {
+    public abstract Builder setScriptIdentifier(Identifier id);
 
-    abstract Builder setParentScriptIdentifier(Identifier id);
+    public abstract Builder setParentScriptIdentifier(Identifier id);
 
-    abstract Builder setHidden(boolean isHidden);
+    public abstract Builder setHidden(boolean isHidden);
 
-    abstract Builder setConditional(boolean isConditional);
+    public abstract Builder setConditional(boolean isConditional);
 
-    abstract Builder setScriptComment(String comment);
+    public abstract Builder setScriptComment(String comment);
 
-    abstract Header build();
+    public abstract Header build();
   }
 }

@@ -16,20 +16,20 @@ public abstract class Type implements Construct {
   public abstract Optional<Identifier> getIdentifier();
 
   /** Returns a fresh {@code Type} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Type.Builder();
   }
 
   /** A builder of {@code Types}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setDataType(DataType dataType);
+  public abstract static class Builder {
+    public abstract Builder setDataType(DataType dataType);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
     abstract Type autoBuild();
 
-    final Type build() {
+    public final Type build() {
       Type type = autoBuild();
       if (type.getDataType().equals(DataType.OBJECT)) {
         checkState(

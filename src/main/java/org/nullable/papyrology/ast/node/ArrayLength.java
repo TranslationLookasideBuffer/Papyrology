@@ -10,15 +10,15 @@ public abstract class ArrayLength implements Expression {
   public abstract Expression getArrayExpression();
 
   /** Returns a fresh {@code ArrayLength} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_ArrayLength.Builder();
   }
 
   /** A builder of {@code ArrayLengths}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setArrayExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setArrayExpression(Expression expression);
 
-    abstract ArrayLength build();
+    public abstract ArrayLength build();
   }
 }

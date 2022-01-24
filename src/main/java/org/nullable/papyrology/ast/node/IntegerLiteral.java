@@ -13,17 +13,17 @@ public abstract class IntegerLiteral implements Literal {
   public abstract String getRawValue();
 
   /** Returns a fresh {@code IntegerLiteral} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_IntegerLiteral.Builder();
   }
 
   /** A builder of {@code IntegerLiterals}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setValue(int value);
+  public abstract static class Builder {
+    public abstract Builder setValue(int value);
 
-    abstract Builder setRawValue(String rawValue);
+    public abstract Builder setRawValue(String rawValue);
 
-    abstract IntegerLiteral build();
+    public abstract IntegerLiteral build();
   }
 }

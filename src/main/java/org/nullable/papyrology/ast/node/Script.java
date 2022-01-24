@@ -14,17 +14,17 @@ public abstract class Script implements Construct {
   public abstract ImmutableList<Declaration> getDeclarations();
 
   /** Returns a fresh {@code Script} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Script.Builder();
   }
 
   /** A builder of {@code ScriptNodes}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setHeader(Header header);
+  public abstract static class Builder {
+    public abstract Builder setHeader(Header header);
 
-    abstract Builder setDeclarations(ImmutableList<Declaration> declarations);
+    public abstract Builder setDeclarations(ImmutableList<Declaration> declarations);
 
-    abstract Script build();
+    public abstract Script build();
   }
 }

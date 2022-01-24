@@ -13,17 +13,17 @@ public abstract class ArrayInitialization implements Expression {
   public abstract int getSize();
 
   /** Returns a fresh {@code ArrayInitialization} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_ArrayInitialization.Builder();
   }
 
   /** A builder of {@code ArrayInitializations}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setType(Type type);
+  public abstract static class Builder {
+    public abstract Builder setType(Type type);
 
-    abstract Builder setSize(int size);
+    public abstract Builder setSize(int size);
 
-    abstract ArrayInitialization build();
+    public abstract ArrayInitialization build();
   }
 }

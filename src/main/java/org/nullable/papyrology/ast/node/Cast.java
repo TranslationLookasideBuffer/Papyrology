@@ -13,17 +13,17 @@ public abstract class Cast implements Expression {
   public abstract Type getType();
 
   /** Returns a fresh {@code Cast} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Cast.Builder();
   }
 
   /** A builder of {@code Castes}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setExpression(Expression expression);
 
-    abstract Builder setType(Type type);
+    public abstract Builder setType(Type type);
 
-    abstract Cast build();
+    public abstract Cast build();
   }
 }

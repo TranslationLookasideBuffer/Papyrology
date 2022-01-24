@@ -13,17 +13,17 @@ public abstract class FloatLiteral implements Literal {
   public abstract String getRawValue();
 
   /** Returns a fresh {@code FloatLiteral} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_FloatLiteral.Builder();
   }
 
   /** A builder of {@code FloatLiterals}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setValue(float value);
+  public abstract static class Builder {
+    public abstract Builder setValue(float value);
 
-    abstract Builder setRawValue(String rawValue);
+    public abstract Builder setRawValue(String rawValue);
 
-    abstract FloatLiteral build();
+    public abstract FloatLiteral build();
   }
 }

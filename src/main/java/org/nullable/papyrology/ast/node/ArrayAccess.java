@@ -13,17 +13,17 @@ public abstract class ArrayAccess implements Expression {
   public abstract Expression getIndexExpression();
 
   /** Returns a fresh {@code ArrayAccess} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_ArrayAccess.Builder();
   }
 
   /** A builder of {@code ArrayAccesses}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setArrayExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setArrayExpression(Expression expression);
 
-    abstract Builder setIndexExpression(Expression expression);
+    public abstract Builder setIndexExpression(Expression expression);
 
-    abstract ArrayAccess build();
+    public abstract ArrayAccess build();
   }
 }

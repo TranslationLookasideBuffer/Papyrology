@@ -63,36 +63,36 @@ public abstract class Property implements Declaration {
   public abstract boolean isConditional();
 
   /** Returns a fresh {@code Property} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Property.Builder();
   }
 
   /** A builder of {@code Properties}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setType(Type type);
+  public abstract static class Builder {
+    public abstract Builder setType(Type type);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
+    public abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
 
-    abstract Builder setSetFunction(Function function);
+    public abstract Builder setSetFunction(Function function);
 
-    abstract Builder setGetFunction(Function function);
+    public abstract Builder setGetFunction(Function function);
 
-    abstract Builder setComment(String comment);
+    public abstract Builder setComment(String comment);
 
-    abstract Builder setAuto(boolean isAuto);
+    public abstract Builder setAuto(boolean isAuto);
 
-    abstract Builder setAutoReadOnly(boolean isAutoReadOnly);
+    public abstract Builder setAutoReadOnly(boolean isAutoReadOnly);
 
-    abstract Builder setHidden(boolean isHidden);
+    public abstract Builder setHidden(boolean isHidden);
 
-    abstract Builder setConditional(boolean isConditional);
+    public abstract Builder setConditional(boolean isConditional);
 
     abstract Property autoBuild();
 
-    final Property build() {
+    public final Property build() {
       Property property = autoBuild();
       if (property.isAuto()) {
         checkState(!property.isAutoReadOnly(), "Property cannot be both Auto and AutoReadOnly");

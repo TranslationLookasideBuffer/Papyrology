@@ -18,17 +18,17 @@ public abstract class UnaryOperation implements Expression {
   public abstract Expression getExpression();
 
   /** Returns a fresh {@code UnaryOperation} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_UnaryOperation.Builder();
   }
 
   /** A builder of {@code UnaryOperations}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setOperator(Operator operator);
+  public abstract static class Builder {
+    public abstract Builder setOperator(Operator operator);
 
-    abstract Builder setExpression(Expression expression);
+    public abstract Builder setExpression(Expression expression);
 
-    abstract UnaryOperation build();
+    public abstract UnaryOperation build();
   }
 }

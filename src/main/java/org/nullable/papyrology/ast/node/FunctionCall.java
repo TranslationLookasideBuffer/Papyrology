@@ -22,19 +22,19 @@ public abstract class FunctionCall implements Expression {
   public abstract ImmutableList<CallParameter> getCallParameters();
 
   /** Returns a fresh {@code FunctionCall} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_FunctionCall.Builder();
   }
 
   /** A builder of {@code FunctionCalls}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setReferenceExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setReferenceExpression(Expression expression);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setCallParameters(ImmutableList<CallParameter> callParameters);
+    public abstract Builder setCallParameters(ImmutableList<CallParameter> callParameters);
 
-    abstract FunctionCall build();
+    public abstract FunctionCall build();
   }
 }

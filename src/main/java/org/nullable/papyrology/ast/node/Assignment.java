@@ -14,18 +14,18 @@ public abstract class Assignment implements Statement {
   public abstract Expression getValueExpression();
 
   /** Returns a fresh {@code Assignment} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Assignment.Builder();
   }
 
   /** A builder of {@code Assignments}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setAssignee(Assignee assignee);
+  public abstract static class Builder {
+    public abstract Builder setAssignee(Assignee assignee);
 
-    abstract Builder setValueExpression(Expression expression);
+    public abstract Builder setValueExpression(Expression expression);
 
-    abstract Assignment build();
+    public abstract Assignment build();
   }
 
   /** A one-of representing the variable/property being updated. */
@@ -45,15 +45,15 @@ public abstract class Assignment implements Statement {
 
     public abstract ArrayAccess getArrayAccess();
 
-    static Assignee ofIdentifier(Identifier identifier) {
+    public static Assignee ofIdentifier(Identifier identifier) {
       return AutoOneOf_Assignment_Assignee.identifier(identifier);
     }
 
-    static Assignee ofDotAccess(DotAccess dotAccess) {
+    public static Assignee ofDotAccess(DotAccess dotAccess) {
       return AutoOneOf_Assignment_Assignee.dotAccess(dotAccess);
     }
 
-    static Assignee ofArrayAccess(ArrayAccess arrayAccess) {
+    public static Assignee ofArrayAccess(ArrayAccess arrayAccess) {
       return AutoOneOf_Assignment_Assignee.arrayAccess(arrayAccess);
     }
   }

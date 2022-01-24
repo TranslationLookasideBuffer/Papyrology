@@ -19,17 +19,22 @@ public abstract class ScriptVariable implements Declaration {
   /** Returns whether or not this script variable is conditional. */
   public abstract boolean isConditional();
 
+  /** Returns a fresh {@code ScriptVariable} builder. */
+  public static Builder builder() {
+    return new AutoValue_ScriptVariable.Builder();
+  }
+
   /** A builder of {@code ScriptVariables}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setType(Type type);
+  public abstract static class Builder {
+    public abstract Builder setType(Type type);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setLiteral(Literal literal);
+    public abstract Builder setLiteral(Literal literal);
 
-    abstract Builder setConditional(boolean isConditional);
+    public abstract Builder setConditional(boolean isConditional);
 
-    abstract ScriptVariable build();
+    public abstract ScriptVariable build();
   }
 }

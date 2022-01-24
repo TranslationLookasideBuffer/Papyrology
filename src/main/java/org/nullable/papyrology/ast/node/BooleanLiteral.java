@@ -13,17 +13,17 @@ public abstract class BooleanLiteral implements Literal {
   public abstract String getRawValue();
 
   /** Returns a fresh {@code BooleanLiteral} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_BooleanLiteral.Builder();
   }
 
   /** A builder of {@code BooleanLiterals}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setValue(boolean value);
+  public abstract static class Builder {
+    public abstract Builder setValue(boolean value);
 
-    abstract Builder setRawValue(String rawValue);
+    public abstract Builder setRawValue(String rawValue);
 
-    abstract BooleanLiteral build();
+    public abstract BooleanLiteral build();
   }
 }

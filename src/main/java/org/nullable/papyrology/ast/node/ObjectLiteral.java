@@ -27,15 +27,15 @@ public abstract class ObjectLiteral implements Literal {
   public abstract Reference getValue();
 
   /** Returns a fresh {@code ObjectLiteral} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_ObjectLiteral.Builder();
   }
 
   /** A builder of {@code ObjectLiterals}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setValue(Reference value);
+  public abstract static class Builder {
+    public abstract Builder setValue(Reference value);
 
-    abstract ObjectLiteral build();
+    public abstract ObjectLiteral build();
   }
 }

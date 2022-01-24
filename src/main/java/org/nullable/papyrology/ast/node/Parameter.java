@@ -17,19 +17,19 @@ public abstract class Parameter implements Construct {
   public abstract Optional<Literal> getDefaultValueLiteral();
 
   /** Returns a fresh {@code Parameter} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Parameter.Builder();
   }
 
   /** A builder of {@code Parameters}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setType(Type type);
+  public abstract static class Builder {
+    public abstract Builder setType(Type type);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
+    public abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
 
-    abstract Parameter build();
+    public abstract Parameter build();
   }
 }

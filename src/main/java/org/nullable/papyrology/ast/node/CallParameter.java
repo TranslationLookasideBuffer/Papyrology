@@ -14,17 +14,17 @@ public abstract class CallParameter implements Construct {
   public abstract Expression getExpression();
 
   /** Returns a fresh {@code CallParameter} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_CallParameter.Builder();
   }
 
   /** A builder of {@code CallParameters}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setIdentifier(Identifier id);
+  public abstract static class Builder {
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract Builder setExpression(Expression expression);
+    public abstract Builder setExpression(Expression expression);
 
-    abstract CallParameter build();
+    public abstract CallParameter build();
   }
 }

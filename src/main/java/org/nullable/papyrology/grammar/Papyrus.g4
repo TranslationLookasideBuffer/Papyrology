@@ -1,43 +1,43 @@
 grammar Papyrus
     ;
 
-script: NEWLINE* header script_line* EOF;
+script: NEWLINE* header scriptLine* EOF;
 
-header: K_SCRIPT_NAME ID (K_EXTENDS ID)? flag = (F_HIDDEN | F_CONDITIONAL)* doc_comment? NEWLINE;
+header: K_SCRIPT_NAME id = ID (K_EXTENDS parent = ID)? ( F_HIDDEN | F_CONDITIONAL )* docComment? NEWLINE;
 
-script_line:          import_declaration | variable_declaration | state_declaration | property_declaration | function_declaration | event_declaration | NEWLINE;
-import_declaration:   K_IMPORT ID NEWLINE;
-variable_declaration: type ID (O_ASSIGN value = literal)? F_CONDITIONAL* NEWLINE;
-state_declaration:    K_AUTO? K_STATE ID NEWLINE (function_declaration | event_declaration | NEWLINE)* K_END_STATE NEWLINE;
-event_declaration
-    : K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? doc_comment? statement_block K_END_EVENT NEWLINE # Event
-    | K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE doc_comment? NEWLINE                              # NativeEvent
+scriptLine:          importDeclaration | variableDeclaration | stateDeclaration | propertyDeclaration | functionDeclaration | eventDeclaration | NEWLINE;
+importDeclaration:   K_IMPORT ID NEWLINE;
+variableDeclaration: type ID (O_ASSIGN value = literal)? F_CONDITIONAL* NEWLINE;
+stateDeclaration:    K_AUTO? K_STATE ID NEWLINE (functionDeclaration | eventDeclaration | NEWLINE)* K_END_STATE NEWLINE;
+eventDeclaration
+    : K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? docComment? statementBlock K_END_EVENT NEWLINE # Event
+    | K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE docComment? NEWLINE                             # NativeEvent
     ;
-property_declaration
-    : type K_PROPERTY ID F_HIDDEN? doc_comment? NEWLINE+ property_function NEWLINE* property_function? NEWLINE* K_END_PROPERTY NEWLINE # FullProperty
-    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* doc_comment? NEWLINE                           # AutoProperty
-    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? doc_comment? NEWLINE                                      # AutoReadOnlyProperty
+propertyDeclaration
+    : type K_PROPERTY ID F_HIDDEN? docComment? NEWLINE+ propertyFunction NEWLINE* propertyFunction? NEWLINE* K_END_PROPERTY NEWLINE # FullProperty
+    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* docComment? NEWLINE                         # AutoProperty
+    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? docComment? NEWLINE                                    # AutoReadOnlyProperty
     ;
-property_function
-    : type K_FUNCTION ID S_LPAREN S_RPAREN NEWLINE doc_comment? statement_block K_END_FUNCTION NEWLINE      # GetPropertyFunction
-    | K_FUNCTION ID S_LPAREN parameter S_RPAREN NEWLINE doc_comment? statement_block K_END_FUNCTION NEWLINE # SetPropertyFunction
+propertyFunction
+    : type K_FUNCTION ID S_LPAREN S_RPAREN NEWLINE docComment? statementBlock K_END_FUNCTION NEWLINE      # GetPropertyFunction
+    | K_FUNCTION ID S_LPAREN parameter S_RPAREN NEWLINE docComment? statementBlock K_END_FUNCTION NEWLINE # SetPropertyFunction
     ;
-function_declaration
-    : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? doc_comment? statement_block K_END_FUNCTION NEWLINE     # Function
-    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? doc_comment? NEWLINE # NativeFunction
+functionDeclaration
+    : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? docComment? statementBlock K_END_FUNCTION NEWLINE      # Function
+    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? docComment? NEWLINE # NativeFunction
     ;
 
-statement_block: statement*;
+statementBlock: statement*;
 statement
-    : type ID (O_ASSIGN value = expression)? NEWLINE                                                                                                       # DefineLocal
-    | statement_assign_value op = (O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO) expression NEWLINE # Assign
-    | K_RETURN expression? NEWLINE                                                                                                                         # Return
-    | K_IF expression NEWLINE statement_block (K_ELSE_IF expression NEWLINE statement_block)* (K_ELSE NEWLINE statement_block)? K_END_IF NEWLINE           # If
-    | K_WHILE expression NEWLINE statement_block K_END_WHILE NEWLINE                                                                                       # While
-    | expression NEWLINE                                                                                                                                   # StandaloneExpression
-    | NEWLINE                                                                                                                                              # BlankLine
+    : type ID (O_ASSIGN value = expression)? NEWLINE                                                                                                     # DefineLocal
+    | statementAssignValue op = (O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO) expression NEWLINE # Assign
+    | K_RETURN expression? NEWLINE                                                                                                                       # Return
+    | K_IF expression NEWLINE statementBlock (K_ELSE_IF expression NEWLINE statementBlock)* (K_ELSE NEWLINE statementBlock)? K_END_IF NEWLINE            # If
+    | K_WHILE expression NEWLINE statementBlock K_END_WHILE NEWLINE                                                                                      # While
+    | expression NEWLINE                                                                                                                                 # StandaloneExpression
+    | NEWLINE                                                                                                                                            # BlankLine
     ;
-statement_assign_value: ID | expression O_DOT ID | expression S_LBRAKET expression S_RBRAKET;
+statementAssignValue: ID | expression O_DOT ID | expression S_LBRAKET expression S_RBRAKET;
 expression
     : a = expression op = O_LOGICAL_OR b = expression                                                                        # BinaryOp
     | a = expression op = O_LOGICAL_AND b = expression                                                                       # BinaryOp
@@ -46,22 +46,22 @@ expression
     | a = expression op = (O_MULTIPLY | O_DIVIDE | O_MODULO) b = expression                                                  # BinaryOp
     | op = (O_SUBTRACT | O_LOGICAL_NOT) value = expression                                                                   # UnaryOp
     | expression K_AS type                                                                                                   # Cast
-    | ID S_LPAREN call_parameters S_RPAREN                                                                                   # LocalFunctionCall
-    | expression O_DOT (K_LENGTH | ID) (S_LPAREN call_parameters S_RPAREN)?                                                  # DotOrFunctionCall
+    | ID S_LPAREN callParameters S_RPAREN                                                                                    # LocalFunctionCall
+    | expression O_DOT (K_LENGTH | ID) (S_LPAREN callParameters S_RPAREN)?                                                   # DotOrFunctionCall
     | S_LPAREN expression S_RPAREN                                                                                           # Parenthetical
     | expression S_LBRAKET index = expression S_RBRAKET                                                                      # ArrayAccess
     | K_NEW type S_LBRAKET size = L_UINT S_RBRAKET                                                                           # ArrayInitialize
     | literal                                                                                                                # LiteralValue
     | ID                                                                                                                     # ID
     ;
-call_parameters: params += call_parameter? (S_COMMA params += call_parameter)*;
-call_parameter:  (ID O_ASSIGN)? expression;
+callParameters: callParameter? (S_COMMA callParameter)*;
+callParameter:  (ID O_ASSIGN)? expression;
 
-type:        (K_INT | K_BOOL | K_FLOAT | K_STRING | ID) (S_LBRAKET S_RBRAKET)?;
-literal:     K_TRUE | K_FALSE | L_FLOAT | L_UINT | L_INT | L_STRING | K_NONE | K_SELF | K_PARENT;
-parameters:  params += parameter? (S_COMMA params += parameter)*;
-parameter:   type ID (O_ASSIGN value = literal)?;
-doc_comment: NEWLINE* DOC_COMMENT;
+type:       (K_INT | K_BOOL | K_FLOAT | K_STRING | ID) (S_LBRAKET S_RBRAKET)?;
+literal:    K_TRUE | K_FALSE | L_FLOAT | L_UINT | L_INT | L_STRING | K_NONE | K_SELF | K_PARENT;
+parameters: parameter? (S_COMMA parameter)*;
+parameter:  type ID (O_ASSIGN literal)?;
+docComment: NEWLINE* DOC_COMMENT;
 
 // Handle Case-Insensitivity
 fragment A: [aA];

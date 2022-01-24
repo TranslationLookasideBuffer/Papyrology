@@ -16,17 +16,17 @@ public abstract class DotAccess implements Expression {
   public abstract Identifier getIdentifier();
 
   /** Returns a fresh {@code DotAccess} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_DotAccess.Builder();
   }
 
   /** A builder of {@code DotAccesses}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setReferenceExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setReferenceExpression(Expression expression);
 
-    abstract Builder setIdentifier(Identifier id);
+    public abstract Builder setIdentifier(Identifier id);
 
-    abstract DotAccess build();
+    public abstract DotAccess build();
   }
 }

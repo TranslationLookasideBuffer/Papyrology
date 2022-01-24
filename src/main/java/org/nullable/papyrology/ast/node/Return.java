@@ -11,15 +11,15 @@ public abstract class Return implements Statement {
   public abstract Optional<Expression> getValueExpression();
 
   /** Returns a fresh {@code Return} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_Return.Builder();
   }
 
   /** A builder of {@code Returns}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setValueExpression(Expression expression);
+  public abstract static class Builder {
+    public abstract Builder setValueExpression(Expression expression);
 
-    abstract Return build();
+    public abstract Return build();
   }
 }

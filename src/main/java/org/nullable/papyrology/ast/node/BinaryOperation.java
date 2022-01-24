@@ -32,19 +32,19 @@ public abstract class BinaryOperation implements Expression {
   public abstract Expression getRightExpression();
 
   /** Returns a fresh {@code BinaryOperation} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_BinaryOperation.Builder();
   }
 
   /** A builder of {@code BinaryOperations}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setOperator(Operator operator);
+  public abstract static class Builder {
+    public abstract Builder setOperator(Operator operator);
 
-    abstract Builder setLeftExpression(Expression expression);
+    public abstract Builder setLeftExpression(Expression expression);
 
-    abstract Builder setRightExpression(Expression expression);
+    public abstract Builder setRightExpression(Expression expression);
 
-    abstract BinaryOperation build();
+    public abstract BinaryOperation build();
   }
 }

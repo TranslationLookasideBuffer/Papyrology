@@ -24,18 +24,18 @@ public abstract class If implements Statement {
   public abstract ImmutableList<Statement> getElseStatements();
 
   /** Returns a fresh {@code If} builder. */
-  static Builder builder() {
+  public static Builder builder() {
     return new AutoValue_If.Builder();
   }
 
   /** A builder of {@code Ifs}. */
   @AutoValue.Builder
-  abstract static class Builder {
-    abstract Builder setConditionalBlocks(ImmutableList<ConditionalBlock> conditionalBlocks);
+  public abstract static class Builder {
+    public abstract Builder setConditionalBlocks(ImmutableList<ConditionalBlock> conditionalBlocks);
 
-    abstract Builder setElseStatements(ImmutableList<Statement> elseStatements);
+    public abstract Builder setElseStatements(ImmutableList<Statement> elseStatements);
 
-    abstract If build();
+    public abstract If build();
   }
 
   @AutoValue
@@ -46,7 +46,7 @@ public abstract class If implements Statement {
     /** Returns the {@link Statement Statements} that make up the body of this conditional. */
     public abstract ImmutableList<Statement> getBodyStatements();
 
-    static ConditionalBlock create(
+    public static ConditionalBlock create(
         Expression conditionalExpression, ImmutableList<Statement> bodyStatements) {
       return new AutoValue_If_ConditionalBlock(conditionalExpression, bodyStatements);
     }
