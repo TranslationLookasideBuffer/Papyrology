@@ -1,9 +1,17 @@
 package org.nullable.papyrology.ast.node;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.ast.common.SourceReference;
+import org.nullable.papyrology.ast.common.SyntaxException;
+import org.nullable.papyrology.grammar.PapyrusParser.AutoPropertyContext;
+import org.nullable.papyrology.grammar.PapyrusParser.AutoReadOnlyPropertyContext;
+import org.nullable.papyrology.grammar.PapyrusParser.FullPropertyContext;
+import org.nullable.papyrology.grammar.PapyrusParser.GetPropertyFunctionContext;
+import org.nullable.papyrology.grammar.PapyrusParser.PropertyDeclarationContext;
+import org.nullable.papyrology.grammar.PapyrusParser.PropertyFunctionContext;
+import org.nullable.papyrology.grammar.PapyrusParser.SetPropertyFunctionContext;
 
 /** A {@link Declaration} that defines a property. */
 @AutoValue
@@ -62,61 +70,165 @@ public abstract class Property implements Declaration {
   /** Returns whether or not this property is hidden. */
   public abstract boolean isConditional();
 
+  /** Returns a new {@code Property} based on the given {@link PropertyDeclarationContext}. */
+  public static Property create(PropertyDeclarationContext ctx) {
+    if (ctx instanceof FullPropertyContext) {
+      return create((FullPropertyContext) ctx);
+    }
+    if (ctx instanceof AutoPropertyContext) {
+      return create((AutoPropertyContext) ctx);
+    }
+    if (ctx instanceof AutoReadOnlyPropertyContext) {
+      return create((AutoReadOnlyPropertyContext) ctx);
+    }
+    throw new IllegalArgumentException(
+        String.format(
+            "Property::create passed an unsupported PropertyDeclarationContext: %s", ctx));
+  }
+
+  private static Property create(FullPropertyContext ctx) {
+    Builder property =
+        builder()
+            .setAuto(false)
+            .setAutoReadOnly(false)
+            .setType(Type.create(ctx.type()))
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setHidden(ctx.F_HIDDEN() != null);
+    if (ctx.docComment() != null) {
+      property.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    boolean getPresent = false;
+    boolean setPresent = false;
+    for (PropertyFunctionContext funcCtx : ctx.propertyFunction()) {
+      if (funcCtx instanceof GetPropertyFunctionContext) {
+        if (getPresent) {
+          throw new SyntaxException(
+              SourceReference.create(funcCtx),
+              "Cannot specify get function for full property twice");
+        }
+        property.setGetFunction(create((GetPropertyFunctionContext) funcCtx));
+        getPresent = true;
+      } else if (funcCtx instanceof SetPropertyFunctionContext) {
+        if (setPresent) {
+          throw new SyntaxException(
+              SourceReference.create(funcCtx),
+              "Cannot specify set function for full property twice");
+        }
+        property.setSetFunction(create((SetPropertyFunctionContext) funcCtx));
+        setPresent = true;
+      } else {
+        throw new IllegalArgumentException(
+            String.format(
+                "Property::create passed malformed PropertyFunctionContext: %s", funcCtx));
+      }
+    }
+    return property.build();
+  }
+
+  private static Function create(GetPropertyFunctionContext ctx) {
+    Identifier identifier = Identifier.create(ctx.ID());
+    if (!identifier.isEquivalent(GET_IDENTIFIER)) {
+      throw new SyntaxException(
+          SourceReference.create(ctx), "Property function must be named \"Get\" or equivalent");
+    }
+    Function.Builder function =
+        Function.builder()
+            .setReturnType(Type.create(ctx.type()))
+            .setIdentifier(identifier)
+            .setParameters(ImmutableList.of())
+            .setBodyStatements(Statement.create(ctx.statementBlock()))
+            .setGlobal(false)
+            .setNative(false);
+    if (ctx.docComment() != null) {
+      function.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    return function.build();
+  }
+
+  private static final Identifier GET_IDENTIFIER = Identifier.builder().setValue("Get").build();
+
+  private static Function create(SetPropertyFunctionContext ctx) {
+    Identifier identifier = Identifier.create(ctx.ID());
+    if (!identifier.isEquivalent(SET_IDENTIFIER)) {
+      throw new SyntaxException(
+          SourceReference.create(ctx), "Property function must be named \"Set\" or equivalent");
+    }
+    Function.Builder function =
+        Function.builder()
+            .setIdentifier(identifier)
+            .setParameters(ImmutableList.of(Parameter.create(ctx.parameter())))
+            .setBodyStatements(Statement.create(ctx.statementBlock()))
+            .setGlobal(false)
+            .setNative(false);
+    if (ctx.docComment() != null) {
+      function.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    return function.build();
+  }
+
+  private static final Identifier SET_IDENTIFIER = Identifier.builder().setValue("Set").build();
+
+  private static Property create(AutoPropertyContext ctx) {
+    Builder property =
+        builder()
+            .setAuto(true)
+            .setAutoReadOnly(false)
+            .setType(Type.create(ctx.type()))
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setHidden(!ctx.F_HIDDEN().isEmpty())
+            .setConditional(!ctx.F_CONDITIONAL().isEmpty());
+    if (ctx.docComment() != null) {
+      property.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    if (ctx.literal() != null) {
+      property.setDefaultValueLiteral(Literal.create(ctx.literal()));
+    }
+    return property.build();
+  }
+
+  private static Property create(AutoReadOnlyPropertyContext ctx) {
+    Builder property =
+        builder()
+            .setAuto(false)
+            .setAutoReadOnly(true)
+            .setType(Type.create(ctx.type()))
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setDefaultValueLiteral(Literal.create(ctx.literal()))
+            .setHidden(ctx.F_HIDDEN() != null);
+    if (ctx.docComment() != null) {
+      property.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    return property.build();
+  }
+
   /** Returns a fresh {@code Property} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Property.Builder();
   }
 
   /** A builder of {@code Properties}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setType(Type type);
+  abstract static class Builder {
+    abstract Builder setType(Type type);
 
-    public abstract Builder setIdentifier(Identifier id);
+    abstract Builder setIdentifier(Identifier id);
 
-    public abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
+    abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
 
-    public abstract Builder setSetFunction(Function function);
+    abstract Builder setSetFunction(Function function);
 
-    public abstract Builder setGetFunction(Function function);
+    abstract Builder setGetFunction(Function function);
 
-    public abstract Builder setComment(String comment);
+    abstract Builder setComment(String comment);
 
-    public abstract Builder setAuto(boolean isAuto);
+    abstract Builder setAuto(boolean isAuto);
 
-    public abstract Builder setAutoReadOnly(boolean isAutoReadOnly);
+    abstract Builder setAutoReadOnly(boolean isAutoReadOnly);
 
-    public abstract Builder setHidden(boolean isHidden);
+    abstract Builder setHidden(boolean isHidden);
 
-    public abstract Builder setConditional(boolean isConditional);
+    abstract Builder setConditional(boolean isConditional);
 
-    abstract Property autoBuild();
-
-    public final Property build() {
-      Property property = autoBuild();
-      if (property.isAuto()) {
-        checkState(!property.isAutoReadOnly(), "Property cannot be both Auto and AutoReadOnly");
-        checkState(
-            property.getSetFunction().isEmpty(), "Auto Property cannot specify Set function");
-        checkState(
-            property.getGetFunction().isEmpty(), "Auto Property cannot specify Get function");
-      } else if (property.isAutoReadOnly()) {
-        checkState(!property.isConditional(), "AutoReadOnly Property cannot be conditional");
-        checkState(
-            property.getDefaultValueLiteral().isPresent(),
-            "AutoReadOnly Property must specify a default value Literal");
-        checkState(
-            property.getSetFunction().isEmpty(),
-            "AutoReadOnly Property cannot specify Set function");
-        checkState(
-            property.getGetFunction().isEmpty(),
-            "AutoReadOnly Property cannot specify Get function");
-      } else {
-        checkState(
-            property.getGetFunction().isPresent() || property.getSetFunction().isPresent(),
-            "Full Property must specify at least a Get or Set function");
-      }
-      return property;
-    }
+    abstract Property build();
   }
 }

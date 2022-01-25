@@ -1,10 +1,11 @@
 package org.nullable.papyrology.ast.node;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.grammar.PapyrusParser.FunctionContext;
+import org.nullable.papyrology.grammar.PapyrusParser.FunctionDeclarationContext;
+import org.nullable.papyrology.grammar.PapyrusParser.NativeFunctionContext;
 
 /** An {@link Invokable} that defines a unit of work that may be called by scripts. */
 @AutoValue
@@ -35,36 +36,73 @@ public abstract class Function implements Invokable {
    */
   public abstract boolean isNative();
 
+  /** Returns a new {@code Function} based on the given {@link FunctionDeclarationContext}. */
+  public static Function create(FunctionDeclarationContext ctx) {
+    if (ctx instanceof FunctionContext) {
+      return create((FunctionContext) ctx);
+    }
+    if (ctx instanceof NativeFunctionContext) {
+      return create((NativeFunctionContext) ctx);
+    }
+    throw new IllegalArgumentException(
+        String.format("Function::create passed malformed FunctionDeclarationContext: %s", ctx));
+  }
+
+  private static Function create(FunctionContext ctx) {
+    Builder function =
+        Function.builder()
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setParameters(Parameter.create(ctx.parameters()))
+            .setBodyStatements(Statement.create(ctx.statementBlock()))
+            .setGlobal(ctx.K_GLOBAL() != null)
+            .setNative(false);
+    if (ctx.docComment() != null) {
+      function.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    if (ctx.type() != null) {
+      function.setReturnType(Type.create(ctx.type()));
+    }
+    return function.build();
+  }
+
+  private static Function create(NativeFunctionContext ctx) {
+    Builder function =
+        Function.builder()
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setParameters(Parameter.create(ctx.parameters()))
+            .setGlobal(!ctx.K_GLOBAL().isEmpty())
+            .setNative(true);
+    if (ctx.docComment() != null) {
+      function.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    if (ctx.type() != null) {
+      function.setReturnType(Type.create(ctx.type()));
+    }
+    return function.build();
+  }
+
   /** Returns a fresh {@code Function} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Function.Builder();
   }
 
   /** A builder of {@code Functions}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setReturnType(Type type);
+  abstract static class Builder {
+    abstract Builder setReturnType(Type type);
 
-    public abstract Builder setIdentifier(Identifier id);
+    abstract Builder setIdentifier(Identifier id);
 
-    public abstract Builder setParameters(ImmutableList<Parameter> parameters);
+    abstract Builder setParameters(ImmutableList<Parameter> parameters);
 
-    public abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
+    abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
 
-    public abstract Builder setComment(String comment);
+    abstract Builder setComment(String comment);
 
-    public abstract Builder setGlobal(boolean isGlobal);
+    abstract Builder setGlobal(boolean isGlobal);
 
-    public abstract Builder setNative(boolean isNative);
+    abstract Builder setNative(boolean isNative);
 
-    abstract Function autoBuild();
-
-    public final Function build() {
-      Function function = autoBuild();
-      checkState(
-          !function.isNative() || function.getBodyStatements().isEmpty(),
-          "Native Function cannot specify body Statements");
-      return function;
-    }
+    abstract Function build();
   }
 }

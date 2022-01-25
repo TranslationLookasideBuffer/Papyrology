@@ -1,9 +1,8 @@
 package org.nullable.papyrology.ast.node;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.grammar.PapyrusParser.TypeContext;
 
 /** Defines a data type for a value. */
 @AutoValue
@@ -15,32 +14,41 @@ public abstract class Type implements Construct {
   /** Returns the {@code Identifier} if the {@code DataType} is {@link DataType#OBJECT}. */
   public abstract Optional<Identifier> getIdentifier();
 
+  /** Returns a new {@code Type} based on the given {@link TypeContext}. */
+  public static Type create(TypeContext ctx) {
+    Builder type = builder();
+    boolean isArray = ctx.S_LBRAKET() != null;
+    if (ctx.K_BOOL() != null) {
+      type.setDataType(isArray ? DataType.BOOL_ARRAY : DataType.BOOL);
+    }
+    if (ctx.K_INT() != null) {
+      type.setDataType(isArray ? DataType.INT_ARRAY : DataType.INT);
+    }
+    if (ctx.K_FLOAT() != null) {
+      type.setDataType(isArray ? DataType.FLOAT_ARRAY : DataType.FLOAT);
+    }
+    if (ctx.K_STRING() != null) {
+      type.setDataType(isArray ? DataType.STRING_ARRAY : DataType.STRING);
+    }
+    if (ctx.ID() != null) {
+      type.setDataType(isArray ? DataType.OBJECT_ARRAY : DataType.OBJECT)
+          .setIdentifier(Identifier.create(ctx.ID()));
+    }
+    return type.build();
+  }
+
   /** Returns a fresh {@code Type} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Type.Builder();
   }
 
   /** A builder of {@code Types}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setDataType(DataType dataType);
+  abstract static class Builder {
+    abstract Builder setDataType(DataType dataType);
 
-    public abstract Builder setIdentifier(Identifier id);
+    abstract Builder setIdentifier(Identifier id);
 
-    abstract Type autoBuild();
-
-    public final Type build() {
-      Type type = autoBuild();
-      if (type.getDataType().equals(DataType.OBJECT)) {
-        checkState(
-            type.getIdentifier().isPresent(),
-            "Identifier must be specified when DataType is OBJECT");
-      } else {
-        checkState(
-            type.getIdentifier().isEmpty(),
-            "Identifier must not be specified when DataType is not OBJECT");
-      }
-      return type;
-    }
+    abstract Type build();
   }
 }

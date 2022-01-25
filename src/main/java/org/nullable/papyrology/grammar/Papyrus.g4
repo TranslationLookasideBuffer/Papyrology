@@ -1,13 +1,13 @@
 grammar Papyrus
     ;
 
-script: NEWLINE* header scriptLine* EOF;
+script: NEWLINE* header declaration* EOF;
 
-header: K_SCRIPT_NAME id = ID (K_EXTENDS parent = ID)? ( F_HIDDEN | F_CONDITIONAL )* docComment? NEWLINE;
+header: K_SCRIPT_NAME ID (K_EXTENDS ID)? ( F_HIDDEN | F_CONDITIONAL)* docComment? NEWLINE;
 
-scriptLine:          importDeclaration | variableDeclaration | stateDeclaration | propertyDeclaration | functionDeclaration | eventDeclaration | NEWLINE;
+declaration:         importDeclaration | variableDeclaration | stateDeclaration | propertyDeclaration | functionDeclaration | eventDeclaration | NEWLINE;
 importDeclaration:   K_IMPORT ID NEWLINE;
-variableDeclaration: type ID (O_ASSIGN value = literal)? F_CONDITIONAL* NEWLINE;
+variableDeclaration: type ID (O_ASSIGN literal)? F_CONDITIONAL* NEWLINE;
 stateDeclaration:    K_AUTO? K_STATE ID NEWLINE (functionDeclaration | eventDeclaration | NEWLINE)* K_END_STATE NEWLINE;
 eventDeclaration
     : K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? docComment? statementBlock K_END_EVENT NEWLINE # Event
@@ -15,21 +15,21 @@ eventDeclaration
     ;
 propertyDeclaration
     : type K_PROPERTY ID F_HIDDEN? docComment? NEWLINE+ propertyFunction NEWLINE* propertyFunction? NEWLINE* K_END_PROPERTY NEWLINE # FullProperty
-    | type K_PROPERTY ID (O_ASSIGN value = literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* docComment? NEWLINE                         # AutoProperty
-    | type K_PROPERTY ID O_ASSIGN value = literal K_AUTO_READ_ONLY F_HIDDEN? docComment? NEWLINE                                    # AutoReadOnlyProperty
+    | type K_PROPERTY ID (O_ASSIGN literal)? K_AUTO (F_HIDDEN | F_CONDITIONAL)* docComment? NEWLINE                                 # AutoProperty
+    | type K_PROPERTY ID O_ASSIGN literal K_AUTO_READ_ONLY F_HIDDEN? docComment? NEWLINE                                            # AutoReadOnlyProperty
     ;
 propertyFunction
     : type K_FUNCTION ID S_LPAREN S_RPAREN NEWLINE docComment? statementBlock K_END_FUNCTION NEWLINE      # GetPropertyFunction
     | K_FUNCTION ID S_LPAREN parameter S_RPAREN NEWLINE docComment? statementBlock K_END_FUNCTION NEWLINE # SetPropertyFunction
     ;
 functionDeclaration
-    : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? docComment? statementBlock K_END_FUNCTION NEWLINE      # Function
-    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN flag += K_GLOBAL? flag += K_NATIVE flag += K_GLOBAL? docComment? NEWLINE # NativeFunction
+    : type? K_FUNCTION ID S_LPAREN parameters S_RPAREN K_GLOBAL? docComment? statementBlock K_END_FUNCTION NEWLINE # Function
+    | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN K_GLOBAL? K_NATIVE K_GLOBAL? docComment? NEWLINE            # NativeFunction
     ;
 
 statementBlock: statement*;
 statement
-    : type ID (O_ASSIGN value = expression)? NEWLINE                                                                                                     # DefineLocal
+    : type ID (O_ASSIGN expression)? NEWLINE                                                                                                             # DefineLocal
     | statementAssignValue op = (O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO) expression NEWLINE # Assign
     | K_RETURN expression? NEWLINE                                                                                                                       # Return
     | K_IF expression NEWLINE statementBlock (K_ELSE_IF expression NEWLINE statementBlock)* (K_ELSE NEWLINE statementBlock)? K_END_IF NEWLINE            # If
@@ -49,8 +49,8 @@ expression
     | ID S_LPAREN callParameters S_RPAREN                                                                                    # LocalFunctionCall
     | expression O_DOT (K_LENGTH | ID) (S_LPAREN callParameters S_RPAREN)?                                                   # DotOrFunctionCall
     | S_LPAREN expression S_RPAREN                                                                                           # Parenthetical
-    | expression S_LBRAKET index = expression S_RBRAKET                                                                      # ArrayAccess
-    | K_NEW type S_LBRAKET size = L_UINT S_RBRAKET                                                                           # ArrayInitialize
+    | expression S_LBRAKET expression S_RBRAKET                                                                              # ArrayAccess
+    | K_NEW type S_LBRAKET L_UINT S_RBRAKET                                                                                  # ArrayInitialization
     | literal                                                                                                                # LiteralValue
     | ID                                                                                                                     # ID
     ;

@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.grammar.PapyrusParser.VariableDeclarationContext;
 
 /** A {@link Declaration} that defines a variable at the script level. */
 @AutoValue
@@ -19,22 +20,27 @@ public abstract class ScriptVariable implements Declaration {
   /** Returns whether or not this script variable is conditional. */
   public abstract boolean isConditional();
 
+  /** Returns a new {@code ScriptVariable} based on the given {@link VariableDeclarationContext}. */
+  public static ScriptVariable create(VariableDeclarationContext ctx) {
+    throw new UnsupportedOperationException();
+  }
+
   /** Returns a fresh {@code ScriptVariable} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_ScriptVariable.Builder();
   }
 
   /** A builder of {@code ScriptVariables}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setType(Type type);
+  abstract static class Builder {
+    abstract Builder setType(Type type);
 
-    public abstract Builder setIdentifier(Identifier id);
+    abstract Builder setIdentifier(Identifier id);
 
-    public abstract Builder setLiteral(Literal literal);
+    abstract Builder setLiteral(Literal literal);
 
-    public abstract Builder setConditional(boolean isConditional);
+    abstract Builder setConditional(boolean isConditional);
 
-    public abstract ScriptVariable build();
+    abstract ScriptVariable build();
   }
 }

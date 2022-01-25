@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import org.nullable.papyrology.grammar.PapyrusParser.StateDeclarationContext;
 
 /** A {@link Declaration} that defines a script state. */
 @AutoValue
@@ -19,20 +20,25 @@ public abstract class State implements Declaration {
   /** Returns whether or not this state is native. */
   public abstract boolean isAuto();
 
+  /** Returns a new {@code State} based on the given {@link StateDeclarationContext}. */
+  public static State create(StateDeclarationContext ctx) {
+    throw new UnsupportedOperationException();
+  }
+
   /** Returns a fresh {@code State} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_State.Builder();
   }
 
   /** A builder of {@code States}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setIdentifier(Identifier id);
+  abstract static class Builder {
+    abstract Builder setIdentifier(Identifier id);
 
-    public abstract Builder setInvokables(ImmutableList<Invokable> invokables);
+    abstract Builder setInvokables(ImmutableList<Invokable> invokables);
 
-    public abstract Builder setAuto(boolean isAuto);
+    abstract Builder setAuto(boolean isAuto);
 
-    public abstract State build();
+    abstract State build();
   }
 }

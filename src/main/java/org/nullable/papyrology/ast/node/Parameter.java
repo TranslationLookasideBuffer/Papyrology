@@ -1,7 +1,12 @@
 package org.nullable.papyrology.ast.node;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.grammar.PapyrusParser.ParameterContext;
+import org.nullable.papyrology.grammar.PapyrusParser.ParametersContext;
 
 /** A parameter defined by a function. */
 @AutoValue
@@ -16,20 +21,40 @@ public abstract class Parameter implements Construct {
   /** Returns the {@link Literal} that is used as this parameter's default value, if present. */
   public abstract Optional<Literal> getDefaultValueLiteral();
 
+  /** Returns a list of {@code Parameters} based on the given {@link ParametersContext}. */
+  public static ImmutableList<Parameter> create(ParametersContext ctx) {
+    if (ctx.parameter() == null) {
+      return ImmutableList.of();
+    }
+    return ctx.parameter().stream().map(Parameter::create).collect(toImmutableList());
+  }
+
+  /** Returns a new {@code Parameter} based on the given {@link ParameterContext}. */
+  public static Parameter create(ParameterContext ctx) {
+    Builder parameter =
+        Parameter.builder()
+            .setType(Type.create(ctx.type()))
+            .setIdentifier(Identifier.create(ctx.ID()));
+    if (ctx.literal() != null) {
+      parameter.setDefaultValueLiteral(Literal.create(ctx.literal()));
+    }
+    return parameter.build();
+  }
+
   /** Returns a fresh {@code Parameter} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Parameter.Builder();
   }
 
   /** A builder of {@code Parameters}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setType(Type type);
+  abstract static class Builder {
+    abstract Builder setType(Type type);
 
-    public abstract Builder setIdentifier(Identifier id);
+    abstract Builder setIdentifier(Identifier id);
 
-    public abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
+    abstract Builder setDefaultValueLiteral(Literal defaultValueLiteral);
 
-    public abstract Parameter build();
+    abstract Parameter build();
   }
 }

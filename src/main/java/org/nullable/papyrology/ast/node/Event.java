@@ -1,10 +1,11 @@
 package org.nullable.papyrology.ast.node;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.grammar.PapyrusParser.EventContext;
+import org.nullable.papyrology.grammar.PapyrusParser.EventDeclarationContext;
+import org.nullable.papyrology.grammar.PapyrusParser.NativeEventContext;
 
 /** An {@link Invokable} that conforms to a game-defined callback function. */
 @AutoValue
@@ -29,32 +30,61 @@ public abstract class Event implements Invokable {
    */
   public abstract boolean isNative();
 
+  /** Returns a new {@code Event} based on the given {@link EventDeclarationContext}. */
+  public static Event create(EventDeclarationContext ctx) {
+    if (ctx instanceof EventContext) {
+      return create((EventContext) ctx);
+    }
+    if (ctx instanceof NativeEventContext) {
+      return create((NativeEventContext) ctx);
+    }
+    throw new IllegalArgumentException(
+        String.format("Event::create passed malformed EventDeclarationContext: %s", ctx));
+  }
+
+  private static Event create(EventContext ctx) {
+    Builder event =
+        Event.builder()
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setParameters(Parameter.create(ctx.parameters()))
+            .setBodyStatements(Statement.create(ctx.statementBlock()))
+            .setNative(false);
+    if (ctx.docComment() != null) {
+      event.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    return event.build();
+  }
+
+  private static Event create(NativeEventContext ctx) {
+    Builder event =
+        Event.builder()
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setParameters(Parameter.create(ctx.parameters()))
+            .setNative(true);
+    if (ctx.docComment() != null) {
+      event.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    return event.build();
+  }
+
   /** Returns a fresh {@code Event} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Event.Builder();
   }
 
   /** A builder of {@code Events}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setIdentifier(Identifier id);
+  abstract static class Builder {
+    abstract Builder setIdentifier(Identifier id);
 
-    public abstract Builder setParameters(ImmutableList<Parameter> parameters);
+    abstract Builder setParameters(ImmutableList<Parameter> parameters);
 
-    public abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
+    abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
 
-    public abstract Builder setComment(String comment);
+    abstract Builder setComment(String comment);
 
-    public abstract Builder setNative(boolean isNative);
+    abstract Builder setNative(boolean isNative);
 
-    abstract Event autoBuild();
-
-    public final Event build() {
-      Event event = autoBuild();
-      checkState(
-          !event.isNative() || event.getBodyStatements().isEmpty(),
-          "Native Event cannot specify body Statements");
-      return event;
-    }
+    abstract Event build();
   }
 }

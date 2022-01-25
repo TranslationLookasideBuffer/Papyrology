@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.grammar.PapyrusParser.HeaderContext;
 
 /** Metadata about a single script. */
 @AutoValue
@@ -25,24 +26,40 @@ public abstract class Header implements Construct {
   /** Returns the content of this script's documentation comment if present. */
   public abstract Optional<String> getScriptComment();
 
+  /** Returns a new {@code Header} based on the given {@link HeaderContext}. */
+  public static Header create(HeaderContext ctx) {
+    Builder header =
+        builder()
+            .setScriptIdentifier(Identifier.create(ctx.ID(0)))
+            .setHidden(!ctx.F_HIDDEN().isEmpty())
+            .setConditional(!ctx.F_CONDITIONAL().isEmpty());
+    if (ctx.ID().size() > 1) {
+      header.setParentScriptIdentifier(Identifier.create(ctx.ID(1)));
+    }
+    if (ctx.docComment() != null) {
+      header.setScriptComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    }
+    return header.build();
+  }
+
   /** Returns a fresh {@code Header} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Header.Builder();
   }
 
   /** A builder of {@code Headers}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setScriptIdentifier(Identifier id);
+  abstract static class Builder {
+    abstract Builder setScriptIdentifier(Identifier id);
 
-    public abstract Builder setParentScriptIdentifier(Identifier id);
+    abstract Builder setParentScriptIdentifier(Identifier id);
 
-    public abstract Builder setHidden(boolean isHidden);
+    abstract Builder setHidden(boolean isHidden);
 
-    public abstract Builder setConditional(boolean isConditional);
+    abstract Builder setConditional(boolean isConditional);
 
-    public abstract Builder setScriptComment(String comment);
+    abstract Builder setScriptComment(String comment);
 
-    public abstract Header build();
+    abstract Header build();
   }
 }
