@@ -70,6 +70,7 @@ public abstract class Function implements Invokable {
         Function.builder()
             .setIdentifier(Identifier.create(ctx.ID()))
             .setParameters(Parameter.create(ctx.parameters()))
+            .setBodyStatements(ImmutableList.of())
             .setGlobal(!ctx.K_GLOBAL().isEmpty())
             .setNative(true);
     if (ctx.docComment() != null) {

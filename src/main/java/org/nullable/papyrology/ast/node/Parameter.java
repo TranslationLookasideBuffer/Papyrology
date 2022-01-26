@@ -32,9 +32,7 @@ public abstract class Parameter implements Construct {
   /** Returns a new {@code Parameter} based on the given {@link ParameterContext}. */
   public static Parameter create(ParameterContext ctx) {
     Builder parameter =
-        Parameter.builder()
-            .setType(Type.create(ctx.type()))
-            .setIdentifier(Identifier.create(ctx.ID()));
+        builder().setType(Type.create(ctx.type())).setIdentifier(Identifier.create(ctx.ID()));
     if (ctx.literal() != null) {
       parameter.setDefaultValueLiteral(Literal.create(ctx.literal()));
     }

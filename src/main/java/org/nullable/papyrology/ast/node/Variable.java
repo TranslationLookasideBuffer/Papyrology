@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.grammar.PapyrusParser.LocalVariableContext;
 
 /** A {@link Statement} that defines a local variable (within an {@code Invokable}). */
 @AutoValue
@@ -16,20 +17,30 @@ public abstract class Variable implements Statement {
   /** Returns the {@link Expression} that defines this variable's initial value, if present. */
   public abstract Optional<Expression> getValueExpression();
 
+  /** Returns a new {@code Variable} based on the given {@link LocalVariableContext}. */
+  public static Variable create(LocalVariableContext ctx) {
+    Builder variable =
+        builder().setType(Type.create(ctx.type())).setIdentifier(Identifier.create(ctx.ID()));
+    if (ctx.expression() != null) {
+      variable.setValueExpression(Expression.create(ctx.expression()));
+    }
+    return variable.build();
+  }
+
   /** Returns a fresh {@code Variable} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Variable.Builder();
   }
 
   /** A builder of {@code Variables}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setType(Type type);
+  abstract static class Builder {
+    abstract Builder setType(Type type);
 
-    public abstract Builder setIdentifier(Identifier id);
+    abstract Builder setIdentifier(Identifier id);
 
-    public abstract Builder setValueExpression(Expression expression);
+    abstract Builder setValueExpression(Expression expression);
 
-    public abstract Variable build();
+    abstract Variable build();
   }
 }

@@ -14,7 +14,7 @@ public abstract class Import implements Declaration {
 
   /** Returns a new {@code Import} based on the given {@link ImportDeclarationContext}. */
   public static Import create(ImportDeclarationContext ctx) {
-    throw new UnsupportedOperationException();
+    return builder().setImportedScriptIdentifier(Identifier.create(ctx.ID())).build();
   }
 
   /** Returns a fresh {@code Import} builder. */

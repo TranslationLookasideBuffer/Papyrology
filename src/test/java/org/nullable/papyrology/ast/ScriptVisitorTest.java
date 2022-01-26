@@ -61,7 +61,7 @@ public class ScriptVisitorTest {
 
     Script script = tree.accept(visitor);
 
-    System.out.println(script);
+    // System.out.println(script);
   }
 
   /**

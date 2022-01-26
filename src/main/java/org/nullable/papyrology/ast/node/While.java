@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import org.nullable.papyrology.grammar.PapyrusParser.WhileContext;
 
 /** A {@link Statement} that defines a repeated, conditional execution of a block of code. */
 @AutoValue
@@ -13,18 +14,26 @@ public abstract class While implements Statement {
   /** Returns the {@link Statement Statements} that make up the body of this loop. */
   public abstract ImmutableList<Statement> getBodyStatements();
 
+  /** Returns a new {@code While} based on the given {@link WhileContext}. */
+  public static While create(WhileContext ctx) {
+    return builder()
+        .setConditionalExpression(Expression.create(ctx.expression()))
+        .setBodyStatements(Statement.create(ctx.statementBlock()))
+        .build();
+  }
+
   /** Returns a fresh {@code While} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_While.Builder();
   }
 
   /** A builder of {@code Whiles}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setConditionalExpression(Expression expression);
+  abstract static class Builder {
+    abstract Builder setConditionalExpression(Expression expression);
 
-    public abstract Builder setBodyStatements(ImmutableList<Statement> statements);
+    abstract Builder setBodyStatements(ImmutableList<Statement> statements);
 
-    public abstract While build();
+    abstract While build();
   }
 }

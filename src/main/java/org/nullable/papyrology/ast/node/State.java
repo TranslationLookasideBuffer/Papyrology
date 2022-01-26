@@ -1,5 +1,7 @@
 package org.nullable.papyrology.ast.node;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import org.nullable.papyrology.grammar.PapyrusParser.StateDeclarationContext;
@@ -22,7 +24,11 @@ public abstract class State implements Declaration {
 
   /** Returns a new {@code State} based on the given {@link StateDeclarationContext}. */
   public static State create(StateDeclarationContext ctx) {
-    throw new UnsupportedOperationException();
+    return builder()
+        .setIdentifier(Identifier.create(ctx.ID()))
+        .setAuto(ctx.K_AUTO() != null)
+        .setInvokables(ctx.invokable().stream().map(Invokable::create).collect(toImmutableList()))
+        .build();
   }
 
   /** Returns a fresh {@code State} builder. */

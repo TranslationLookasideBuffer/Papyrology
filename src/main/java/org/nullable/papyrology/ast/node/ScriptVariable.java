@@ -22,7 +22,15 @@ public abstract class ScriptVariable implements Declaration {
 
   /** Returns a new {@code ScriptVariable} based on the given {@link VariableDeclarationContext}. */
   public static ScriptVariable create(VariableDeclarationContext ctx) {
-    throw new UnsupportedOperationException();
+    Builder scriptVariable =
+        builder()
+            .setType(Type.create(ctx.type()))
+            .setIdentifier(Identifier.create(ctx.ID()))
+            .setConditional(!ctx.F_CONDITIONAL().isEmpty());
+    if (ctx.literal() != null) {
+      scriptVariable.setLiteral(Literal.create(ctx.literal()));
+    }
+    return scriptVariable.build();
   }
 
   /** Returns a fresh {@code ScriptVariable} builder. */

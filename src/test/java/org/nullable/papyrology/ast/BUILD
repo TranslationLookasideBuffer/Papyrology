@@ -6,8 +6,8 @@ java_test(
     ],
     deps = [
         "//src/main/java/org/nullable/papyrology/ast",
-        "//src/main/java/org/nullable/papyrology/grammar",
         "//src/main/java/org/nullable/papyrology/ast/node",
+        "//src/main/java/org/nullable/papyrology/grammar",
         "//src/main/third_party:antlr",
         "//src/main/third_party:guava",
         "//src/main/third_party:junit",

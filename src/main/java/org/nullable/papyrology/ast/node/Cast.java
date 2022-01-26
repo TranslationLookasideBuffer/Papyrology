@@ -1,6 +1,7 @@
 package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
+import org.nullable.papyrology.grammar.PapyrusParser.CastContext;
 
 /** An {@link Expression} that changes the {@code Type} and an {@code Expression}. */
 @AutoValue
@@ -12,18 +13,26 @@ public abstract class Cast implements Expression {
   /** Returns the {@link Type} being cast to. */
   public abstract Type getType();
 
+  /** Returns a new {@code Cast} based on the given {@link CastContext}. */
+  public static Cast create(CastContext ctx) {
+    return builder()
+        .setExpression(Expression.create(ctx.expression()))
+        .setType(Type.create(ctx.type()))
+        .build();
+  }
+
   /** Returns a fresh {@code Cast} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_Cast.Builder();
   }
 
   /** A builder of {@code Castes}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setExpression(Expression expression);
+  abstract static class Builder {
+    abstract Builder setExpression(Expression expression);
 
-    public abstract Builder setType(Type type);
+    abstract Builder setType(Type type);
 
-    public abstract Cast build();
+    abstract Cast build();
   }
 }

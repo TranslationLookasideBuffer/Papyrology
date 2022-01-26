@@ -1,14 +1,15 @@
 grammar Papyrus
     ;
 
-script: NEWLINE* header declaration* EOF;
+script: NEWLINE* header (declaration | NEWLINE)* EOF;
 
-header: K_SCRIPT_NAME ID (K_EXTENDS ID)? ( F_HIDDEN | F_CONDITIONAL)* docComment? NEWLINE;
+header: K_SCRIPT_NAME ID (K_EXTENDS ID)? (F_HIDDEN | F_CONDITIONAL)* docComment? NEWLINE;
 
-declaration:         importDeclaration | variableDeclaration | stateDeclaration | propertyDeclaration | functionDeclaration | eventDeclaration | NEWLINE;
+declaration:         importDeclaration | variableDeclaration | stateDeclaration | propertyDeclaration | functionDeclaration | eventDeclaration;
 importDeclaration:   K_IMPORT ID NEWLINE;
 variableDeclaration: type ID (O_ASSIGN literal)? F_CONDITIONAL* NEWLINE;
-stateDeclaration:    K_AUTO? K_STATE ID NEWLINE (functionDeclaration | eventDeclaration | NEWLINE)* K_END_STATE NEWLINE;
+stateDeclaration:    K_AUTO? K_STATE ID NEWLINE (invokable | NEWLINE)* K_END_STATE NEWLINE;
+invokable:           functionDeclaration | eventDeclaration;
 eventDeclaration
     : K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? docComment? statementBlock K_END_EVENT NEWLINE # Event
     | K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE docComment? NEWLINE                             # NativeEvent
@@ -27,32 +28,36 @@ functionDeclaration
     | type? K_FUNCTION ID S_LPAREN parameters S_RPAREN K_GLOBAL? K_NATIVE K_GLOBAL? docComment? NEWLINE            # NativeFunction
     ;
 
-statementBlock: statement*;
+statementBlock: (statement | NEWLINE)*;
 statement
-    : type ID (O_ASSIGN expression)? NEWLINE                                                                                                             # DefineLocal
-    | statementAssignValue op = (O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO) expression NEWLINE # Assign
-    | K_RETURN expression? NEWLINE                                                                                                                       # Return
-    | K_IF expression NEWLINE statementBlock (K_ELSE_IF expression NEWLINE statementBlock)* (K_ELSE NEWLINE statementBlock)? K_END_IF NEWLINE            # If
-    | K_WHILE expression NEWLINE statementBlock K_END_WHILE NEWLINE                                                                                      # While
-    | expression NEWLINE                                                                                                                                 # StandaloneExpression
-    | NEWLINE                                                                                                                                            # BlankLine
+    : type ID (O_ASSIGN expression)? NEWLINE                                                                                                  # LocalVariable
+    | assignee op = (O_ASSIGN | O_ASSIGN_ADD | O_ASSIGN_SUBTRACT | O_ASSIGN_MULTIPLY | O_ASSIGN_DIVIDE | O_ASSIGN_MODULO) expression NEWLINE  # Assignment
+    | K_RETURN expression? NEWLINE                                                                                                            # Return
+    | K_IF expression NEWLINE statementBlock (K_ELSE_IF expression NEWLINE statementBlock)* (K_ELSE NEWLINE statementBlock)? K_END_IF NEWLINE # If
+    | K_WHILE expression NEWLINE statementBlock K_END_WHILE NEWLINE                                                                           # While
+    | expression NEWLINE                                                                                                                      # StandaloneExpression
     ;
-statementAssignValue: ID | expression O_DOT ID | expression S_LBRAKET expression S_RBRAKET;
+assignee
+    : ID                                        # IdentifierAssignee
+    | expression O_DOT ID                       # DotAccessAssignee
+    | expression S_LBRAKET expression S_RBRAKET # ArrayAccessAssignee
+    ;
 expression
-    : a = expression op = O_LOGICAL_OR b = expression                                                                        # BinaryOp
-    | a = expression op = O_LOGICAL_AND b = expression                                                                       # BinaryOp
-    | a = expression op = (O_EQUAL | O_NOT_EQUAL | O_GREATER | O_GREATER_OR_EQUAL | O_LESS | O_LESS_OR_EQUAL) b = expression # BinaryOp
-    | a = expression op = (O_ADD | O_SUBTRACT) b = expression                                                                # BinaryOp
-    | a = expression op = (O_MULTIPLY | O_DIVIDE | O_MODULO) b = expression                                                  # BinaryOp
-    | op = (O_SUBTRACT | O_LOGICAL_NOT) value = expression                                                                   # UnaryOp
-    | expression K_AS type                                                                                                   # Cast
-    | ID S_LPAREN callParameters S_RPAREN                                                                                    # LocalFunctionCall
-    | expression O_DOT (K_LENGTH | ID) (S_LPAREN callParameters S_RPAREN)?                                                   # DotOrFunctionCall
-    | S_LPAREN expression S_RPAREN                                                                                           # Parenthetical
-    | expression S_LBRAKET expression S_RBRAKET                                                                              # ArrayAccess
-    | K_NEW type S_LBRAKET L_UINT S_RBRAKET                                                                                  # ArrayInitialization
-    | literal                                                                                                                # LiteralValue
-    | ID                                                                                                                     # ID
+    : left = expression op = O_LOGICAL_OR right = expression                                                                        # BinaryOperation
+    | left = expression op = O_LOGICAL_AND right = expression                                                                       # BinaryOperation
+    | left = expression op = (O_EQUAL | O_NOT_EQUAL | O_GREATER | O_GREATER_OR_EQUAL | O_LESS | O_LESS_OR_EQUAL) right = expression # BinaryOperation
+    | left = expression op = (O_ADD | O_SUBTRACT) right = expression                                                                # BinaryOperation
+    | left = expression op = (O_MULTIPLY | O_DIVIDE | O_MODULO) right = expression                                                  # BinaryOperation
+    | op = (O_SUBTRACT | O_LOGICAL_NOT) value = expression                                                                          # UnaryOperation
+    | expression K_AS type                                                                                                          # Cast
+    | ID S_LPAREN callParameters S_RPAREN                                                                                           # LocalFunctionCall
+    | expression O_DOT ID (S_LPAREN callParameters S_RPAREN)?                                                                       # DotAccessOrFunctionCall
+    | expression O_DOT K_LENGTH                                                                                                     # ArrayLength
+    | S_LPAREN expression S_RPAREN                                                                                                  # Parenthetical
+    | expression S_LBRAKET expression S_RBRAKET                                                                                     # ArrayAccess
+    | K_NEW type S_LBRAKET L_UINT S_RBRAKET                                                                                         # ArrayInitialization
+    | literal                                                                                                                       # LiteralValue
+    | ID                                                                                                                            # ID
     ;
 callParameters: callParameter? (S_COMMA callParameter)*;
 callParameter:  (ID O_ASSIGN)? expression;

@@ -7,6 +7,7 @@ import java.util.Locale;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.nullable.papyrology.grammar.PapyrusParser;
+import java.math.BigInteger;
 
 /** A {@link Literal} integer value (e.g. {@code 42}). */
 @AutoValue
@@ -14,6 +15,14 @@ public abstract class IntegerLiteral implements Literal {
 
   /** Returns the actual value of this literal. */
   public abstract int getValue();
+
+  /**
+   * Returns whether or not this integer value was out of the 32-bit signed integer range.
+   * 
+   * <p>If this returns {@code true}, {@link #getValue()} will return either {@link
+   * Integer#MAX_VALUE} or {@link Integer#MIN_VALUE}.
+   */
+  public abstract boolean isOutOfRange();
 
   /** Returns the raw value of the literal (as it appears in source). */
   public abstract String getRawValue();
@@ -25,15 +34,31 @@ public abstract class IntegerLiteral implements Literal {
         token.getType() == PapyrusParser.L_UINT || token.getType() == PapyrusParser.L_INT,
         " IntegerLiteral::create passed an unsupported TerminalNode: %s",
         node);
-    return builder().setValue(parseInteger(token.getText())).setRawValue(token.getText()).build();
+    ParsedValue parsed = parseInteger(token.getText());
+    return builder().setValue(parsed.value).setOutOfRange(parsed.isOutOfRange).setRawValue(token.getText()).build();
   }
 
-  private static int parseInteger(String raw) {
+  /**
+   * Parses a string in a way that can handle values far outside the bounds of a 32-bit integer.
+   * 
+   * <p>This is required because the reference compiler supports such numbers.
+   */
+  private static ParsedValue parseInteger(String raw) {
     String lower = raw.toLowerCase(Locale.US);
-    return lower.contains("0x")
-        ? Integer.parseInt(lower.replace("0x", ""), 16)
-        : Integer.parseInt(lower);
+    BigInteger value = lower.contains("0x")
+        ? new BigInteger(lower.replace("0x", ""), 16)
+        : new BigInteger(lower);
+    if (value.compareTo(MAX_VALUE) > 0) {
+      return new ParsedValue(Integer.MAX_VALUE, /* isOutOfRange= */ true);
+    }
+    if (value.compareTo(MIN_VALUE) < 0) {
+      return new ParsedValue(Integer.MIN_VALUE, /* isOutOfRange= */ true);
+    }
+    return new ParsedValue(value.intValue(), /* isOutOfRange= */ false);
   }
+
+  private static final BigInteger MAX_VALUE = BigInteger.valueOf(Integer.MAX_VALUE);
+  private static final BigInteger MIN_VALUE = BigInteger.valueOf(Integer.MIN_VALUE);
 
   /** Returns a fresh {@code IntegerLiteral} builder. */
   static Builder builder() {
@@ -45,8 +70,20 @@ public abstract class IntegerLiteral implements Literal {
   abstract static class Builder {
     abstract Builder setValue(int value);
 
+    abstract Builder setOutOfRange(boolean isOutOfRange);
+
     abstract Builder setRawValue(String rawValue);
 
     abstract IntegerLiteral build();
+  }
+
+  private static class ParsedValue {
+    private final int value;
+    private final boolean isOutOfRange;
+
+    ParsedValue(int value, boolean isOutOfRange) {
+      this.value = value;
+      this.isOutOfRange = isOutOfRange;
+    }
   }
 }

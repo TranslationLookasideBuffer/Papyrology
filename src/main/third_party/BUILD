@@ -17,15 +17,15 @@ java_library(
 
 java_plugin(
     name = "autovalue_plugin",
-    visibility = ["//visibility:private"],
     processor_class = "com.google.auto.value.processor.AutoValueProcessor",
+    visibility = ["//visibility:private"],
     deps = ["@maven//:com_google_auto_value_auto_value"],
 )
 
 java_plugin(
     name = "autooneof_plugin",
-    visibility = ["//visibility:private"],
     processor_class = "com.google.auto.value.processor.AutoOneOfProcessor",
+    visibility = ["//visibility:private"],
     deps = ["@maven//:com_google_auto_value_auto_value"],
 )
 

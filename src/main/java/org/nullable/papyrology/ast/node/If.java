@@ -2,7 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-import java.beans.Expression;
+import org.nullable.papyrology.grammar.PapyrusParser.IfContext;
 
 /** A {@link Statement} that defines some series of conditional execution of blocks of code. */
 @AutoValue
@@ -23,19 +23,39 @@ public abstract class If implements Statement {
    */
   public abstract ImmutableList<Statement> getElseStatements();
 
+  /** Returns a new {@code If} based on the given {@link IfContext}. */
+  public static If create(IfContext ctx) {
+    ImmutableList.Builder<ConditionalBlock> conditionalBlocks = ImmutableList.builder();
+    int expressions = ctx.expression().size();
+    for (int i = 0; i < expressions; i++) {
+      conditionalBlocks.add(
+          ConditionalBlock.create(
+              Expression.create(ctx.expression(i)), Statement.create(ctx.statementBlock(i))));
+    }
+    // If an else statement is present, ctx.statementBlock() will have exactly one more element
+    // than ctx.expression() and it will be the last element in the list.
+    return builder()
+        .setConditionalBlocks(conditionalBlocks.build())
+        .setElseStatements(
+            ctx.statementBlock().size() > expressions
+                ? Statement.create(ctx.statementBlock(expressions))
+                : ImmutableList.of())
+        .build();
+  }
+
   /** Returns a fresh {@code If} builder. */
-  public static Builder builder() {
+  static Builder builder() {
     return new AutoValue_If.Builder();
   }
 
   /** A builder of {@code Ifs}. */
   @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setConditionalBlocks(ImmutableList<ConditionalBlock> conditionalBlocks);
+  abstract static class Builder {
+    abstract Builder setConditionalBlocks(ImmutableList<ConditionalBlock> conditionalBlocks);
 
-    public abstract Builder setElseStatements(ImmutableList<Statement> elseStatements);
+    abstract Builder setElseStatements(ImmutableList<Statement> elseStatements);
 
-    public abstract If build();
+    abstract If build();
   }
 
   @AutoValue
@@ -46,7 +66,7 @@ public abstract class If implements Statement {
     /** Returns the {@link Statement Statements} that make up the body of this conditional. */
     public abstract ImmutableList<Statement> getBodyStatements();
 
-    public static ConditionalBlock create(
+    static ConditionalBlock create(
         Expression conditionalExpression, ImmutableList<Statement> bodyStatements) {
       return new AutoValue_If_ConditionalBlock(conditionalExpression, bodyStatements);
     }

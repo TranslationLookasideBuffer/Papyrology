@@ -15,12 +15,13 @@ public abstract class BooleanLiteral implements Literal {
   /** Returns the raw value of the literal (as it appears in source). */
   public abstract String getRawValue();
 
-  /** Creates a {@code BooleanLiteral} based on the given {@link TerminalNode}. */
+  /** Returns a new {@code BooleanLiteral} based on the given {@link TerminalNode}. */
   public static BooleanLiteral create(TerminalNode node) {
     Token token = node.getSymbol();
     if (token.getType() == PapyrusParser.K_TRUE) {
       return builder().setValue(true).setRawValue(token.getText()).build();
-    } else if (token.getType() == PapyrusParser.K_FALSE) {
+    }
+    if (token.getType() == PapyrusParser.K_FALSE) {
       return builder().setValue(false).setRawValue(token.getText()).build();
     }
     throw new IllegalArgumentException(

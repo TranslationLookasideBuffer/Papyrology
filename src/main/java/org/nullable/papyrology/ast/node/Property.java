@@ -93,6 +93,7 @@ public abstract class Property implements Declaration {
             .setAutoReadOnly(false)
             .setType(Type.create(ctx.type()))
             .setIdentifier(Identifier.create(ctx.ID()))
+            .setConditional(false)
             .setHidden(ctx.F_HIDDEN() != null);
     if (ctx.docComment() != null) {
       property.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
@@ -194,6 +195,7 @@ public abstract class Property implements Declaration {
             .setType(Type.create(ctx.type()))
             .setIdentifier(Identifier.create(ctx.ID()))
             .setDefaultValueLiteral(Literal.create(ctx.literal()))
+            .setConditional(false)
             .setHidden(ctx.F_HIDDEN() != null);
     if (ctx.docComment() != null) {
       property.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
