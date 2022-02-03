@@ -55,6 +55,11 @@ java_library(
 )
 
 java_library(
+    name = "flogger",
+    exports = ["@maven//:com_google_flogger_flogger"],
+)
+
+java_library(
     name = "antlr",
     exports = ["@antlr4_runtime//jar"],
 )

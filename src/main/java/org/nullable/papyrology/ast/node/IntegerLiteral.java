@@ -3,11 +3,11 @@ package org.nullable.papyrology.ast.node;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.auto.value.AutoValue;
+import java.math.BigInteger;
 import java.util.Locale;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.nullable.papyrology.grammar.PapyrusParser;
-import java.math.BigInteger;
 
 /** A {@link Literal} integer value (e.g. {@code 42}). */
 @AutoValue
@@ -18,7 +18,7 @@ public abstract class IntegerLiteral implements Literal {
 
   /**
    * Returns whether or not this integer value was out of the 32-bit signed integer range.
-   * 
+   *
    * <p>If this returns {@code true}, {@link #getValue()} will return either {@link
    * Integer#MAX_VALUE} or {@link Integer#MIN_VALUE}.
    */
@@ -35,19 +35,22 @@ public abstract class IntegerLiteral implements Literal {
         " IntegerLiteral::create passed an unsupported TerminalNode: %s",
         node);
     ParsedValue parsed = parseInteger(token.getText());
-    return builder().setValue(parsed.value).setOutOfRange(parsed.isOutOfRange).setRawValue(token.getText()).build();
+    return builder()
+        .setValue(parsed.value)
+        .setOutOfRange(parsed.isOutOfRange)
+        .setRawValue(token.getText())
+        .build();
   }
 
   /**
    * Parses a string in a way that can handle values far outside the bounds of a 32-bit integer.
-   * 
+   *
    * <p>This is required because the reference compiler supports such numbers.
    */
   private static ParsedValue parseInteger(String raw) {
     String lower = raw.toLowerCase(Locale.US);
-    BigInteger value = lower.contains("0x")
-        ? new BigInteger(lower.replace("0x", ""), 16)
-        : new BigInteger(lower);
+    BigInteger value =
+        lower.contains("0x") ? new BigInteger(lower.replace("0x", ""), 16) : new BigInteger(lower);
     if (value.compareTo(MAX_VALUE) > 0) {
       return new ParsedValue(Integer.MAX_VALUE, /* isOutOfRange= */ true);
     }
