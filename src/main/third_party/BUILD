@@ -55,8 +55,8 @@ java_library(
 )
 
 java_library(
-    name = "flogger",
-    exports = ["@maven//:com_google_flogger_flogger"],
+    name = "jimfs",
+    exports = ["@maven//:com_google_jimfs_jimfs"],
 )
 
 java_library(

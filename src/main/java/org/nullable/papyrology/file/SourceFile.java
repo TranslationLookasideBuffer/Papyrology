@@ -7,14 +7,6 @@ import java.nio.file.Path;
 @AutoValue
 public abstract class SourceFile {
 
-  /**
-   * Returns whether or not this {@code SourceFile} is a supplemental file to be used in support of
-   * compiling other {@code SourceFiles} (e.g. by static analysis).
-   *
-   * <p>When this method returns {@code true}, this file should not result in compiled output.
-   */
-  abstract boolean isSupplemental();
-
   /** Returns the {@code Path} of this {@code SourceFile}. */
   abstract Path getPath();
 
@@ -34,8 +26,6 @@ public abstract class SourceFile {
   /** A builder of {@code SourceFiles}. */
   @AutoValue.Builder
   abstract static class Builder {
-    abstract Builder setSupplemental(boolean isSupplemental);
-
     abstract Builder setPath(Path path);
 
     abstract Builder setContent(String content);

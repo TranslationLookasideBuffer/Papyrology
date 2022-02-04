@@ -55,6 +55,7 @@ maven_install(
         "com.google.auto.value:auto-value-annotations:1.9",
         "com.google.auto.value:auto-value:1.9",
         "com.google.errorprone:error_prone_annotations:2.10.0",
+        "com.google.jimfs:jimfs:1.2",
     ],
     repositories = [
         "https://maven.google.com",
