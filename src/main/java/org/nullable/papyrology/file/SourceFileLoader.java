@@ -1,7 +1,5 @@
 package org.nullable.papyrology.file;
 
-
-
 /** A utility for creating {@link SourceFile SourceFiles} from basic {@code String} paths. */
 public interface SourceFileLoader {
 

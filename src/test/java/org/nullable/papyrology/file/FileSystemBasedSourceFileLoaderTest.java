@@ -5,26 +5,25 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.charset.StandardCharsets;
-import java.io.IOException;
-import com.google.common.collect.ImmutableList;
-import java.util.Locale;
 
 @RunWith(Parameterized.class)
 public class FileSystemBasedSourceFileLoaderTest {
 
   @Parameters(name = "{0}")
   public static Configuration[] data() {
-    return new Configuration[]{Configuration.unix(), Configuration.osX(), Configuration.windows()};
+    return new Configuration[] {Configuration.unix(), Configuration.osX(), Configuration.windows()};
   }
 
   private static final String SCRIPT_ID = "Form";
@@ -60,7 +59,8 @@ public class FileSystemBasedSourceFileLoaderTest {
 
   @Test
   public void exactFileName_loaded() {
-    SourceFile expected = SourceFile.builder().setPath(scriptPath).setContent(SCRIPT_CONTENT).build();
+    SourceFile expected =
+        SourceFile.builder().setPath(scriptPath).setContent(SCRIPT_CONTENT).build();
 
     SourceFile actual = loader.load(SCRIPT_ID);
 
@@ -69,7 +69,8 @@ public class FileSystemBasedSourceFileLoaderTest {
 
   @Test
   public void alteredFileName_loaded() {
-    SourceFile expected = SourceFile.builder().setPath(scriptPath).setContent(SCRIPT_CONTENT).build();
+    SourceFile expected =
+        SourceFile.builder().setPath(scriptPath).setContent(SCRIPT_CONTENT).build();
 
     SourceFile actual = loader.load(SCRIPT_ID.toLowerCase(Locale.US));
 
