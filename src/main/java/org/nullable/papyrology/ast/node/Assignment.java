@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.auto.value.AutoOneOf;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 import org.nullable.papyrology.grammar.PapyrusParser.ArrayAccessAssigneeContext;
 import org.nullable.papyrology.grammar.PapyrusParser.AssigneeContext;
@@ -50,6 +51,7 @@ public abstract class Assignment implements Statement {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());
     checkState(operator != null, "Assignment::create was unable to resolve the operator");
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setAssignee(Assignee.create(ctx.assignee()))
         .setOperator(operator)
         .setValueExpression(Expression.create(ctx.expression()))
@@ -64,6 +66,8 @@ public abstract class Assignment implements Statement {
   /** A builder of {@code Assignments}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setAssignee(Assignee assignee);
 
     abstract Builder setOperator(Operator operator);

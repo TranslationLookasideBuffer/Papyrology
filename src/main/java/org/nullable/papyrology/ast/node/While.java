@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.WhileContext;
 
 /** A {@link Statement} that defines a repeated, conditional execution of a block of code. */
@@ -17,6 +18,7 @@ public abstract class While implements Statement {
   /** Returns a new {@code While} based on the given {@link WhileContext}. */
   public static While create(WhileContext ctx) {
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setConditionalExpression(Expression.create(ctx.expression()))
         .setBodyStatements(Statement.create(ctx.statementBlock()))
         .build();
@@ -30,6 +32,8 @@ public abstract class While implements Statement {
   /** A builder of {@code Whiles}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setConditionalExpression(Expression expression);
 
     abstract Builder setBodyStatements(ImmutableList<Statement> statements);

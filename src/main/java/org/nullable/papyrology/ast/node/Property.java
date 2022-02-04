@@ -3,8 +3,8 @@ package org.nullable.papyrology.ast.node;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
-import org.nullable.papyrology.ast.common.SourceReference;
 import org.nullable.papyrology.ast.common.SyntaxException;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.AutoPropertyContext;
 import org.nullable.papyrology.grammar.PapyrusParser.AutoReadOnlyPropertyContext;
 import org.nullable.papyrology.grammar.PapyrusParser.FullPropertyContext;
@@ -89,6 +89,7 @@ public abstract class Property implements Declaration {
   private static Property create(FullPropertyContext ctx) {
     Builder property =
         builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setAuto(false)
             .setAutoReadOnly(false)
             .setType(Type.create(ctx.type()))
@@ -134,6 +135,7 @@ public abstract class Property implements Declaration {
     }
     Function.Builder function =
         Function.builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setReturnType(Type.create(ctx.type()))
             .setIdentifier(identifier)
             .setParameters(ImmutableList.of())
@@ -156,6 +158,7 @@ public abstract class Property implements Declaration {
     }
     Function.Builder function =
         Function.builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setIdentifier(identifier)
             .setParameters(ImmutableList.of(Parameter.create(ctx.parameter())))
             .setBodyStatements(Statement.create(ctx.statementBlock()))
@@ -172,6 +175,7 @@ public abstract class Property implements Declaration {
   private static Property create(AutoPropertyContext ctx) {
     Builder property =
         builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setAuto(true)
             .setAutoReadOnly(false)
             .setType(Type.create(ctx.type()))
@@ -190,6 +194,7 @@ public abstract class Property implements Declaration {
   private static Property create(AutoReadOnlyPropertyContext ctx) {
     Builder property =
         builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setAuto(false)
             .setAutoReadOnly(true)
             .setType(Type.create(ctx.type()))
@@ -211,6 +216,8 @@ public abstract class Property implements Declaration {
   /** A builder of {@code Properties}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setType(Type type);
 
     abstract Builder setIdentifier(Identifier id);

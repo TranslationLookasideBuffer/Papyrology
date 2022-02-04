@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 import org.nullable.papyrology.grammar.PapyrusParser.UnaryOperationContext;
 
@@ -32,7 +33,11 @@ public abstract class UnaryOperation implements Expression {
   public static UnaryOperation create(UnaryOperationContext ctx) {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());
     checkState(operator != null, "UnaryOperation::create was unable to resolve the operator");
-    return builder().setOperator(operator).setExpression(Expression.create(ctx.value)).build();
+    return builder()
+        .setSourceReference(SourceReference.create(ctx))
+        .setOperator(operator)
+        .setExpression(Expression.create(ctx.value))
+        .build();
   }
 
   /** Returns a fresh {@code UnaryOperation} builder. */
@@ -43,6 +48,8 @@ public abstract class UnaryOperation implements Expression {
   /** A builder of {@code UnaryOperations}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setOperator(Operator operator);
 
     abstract Builder setExpression(Expression expression);

@@ -1,6 +1,7 @@
 package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.ArrayLengthContext;
 
 /** An {@link Expression} that evaluates to the length of an array. */
@@ -12,7 +13,10 @@ public abstract class ArrayLength implements Expression {
 
   /** Returns a new {@code ArrayLength} based on the given {@link ArrayLengthContext}. */
   public static ArrayLength create(ArrayLengthContext ctx) {
-    return builder().setArrayExpression(Expression.create(ctx.expression())).build();
+    return builder()
+        .setSourceReference(SourceReference.create(ctx))
+        .setArrayExpression(Expression.create(ctx.expression()))
+        .build();
   }
 
   /** Returns a fresh {@code ArrayLength} builder. */
@@ -23,6 +27,8 @@ public abstract class ArrayLength implements Expression {
   /** A builder of {@code ArrayLengths}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setArrayExpression(Expression expression);
 
     abstract ArrayLength build();

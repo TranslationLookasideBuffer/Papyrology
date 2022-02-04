@@ -3,6 +3,7 @@ package org.nullable.papyrology.ast.node;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.EventContext;
 import org.nullable.papyrology.grammar.PapyrusParser.EventDeclarationContext;
 import org.nullable.papyrology.grammar.PapyrusParser.NativeEventContext;
@@ -45,6 +46,7 @@ public abstract class Event implements Invokable {
   private static Event create(EventContext ctx) {
     Builder event =
         Event.builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setIdentifier(Identifier.create(ctx.ID()))
             .setParameters(Parameter.create(ctx.parameters()))
             .setBodyStatements(Statement.create(ctx.statementBlock()))
@@ -58,6 +60,7 @@ public abstract class Event implements Invokable {
   private static Event create(NativeEventContext ctx) {
     Builder event =
         Event.builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setIdentifier(Identifier.create(ctx.ID()))
             .setParameters(Parameter.create(ctx.parameters()))
             .setNative(true);
@@ -75,6 +78,8 @@ public abstract class Event implements Invokable {
   /** A builder of {@code Events}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setIdentifier(Identifier id);
 
     abstract Builder setParameters(ImmutableList<Parameter> parameters);

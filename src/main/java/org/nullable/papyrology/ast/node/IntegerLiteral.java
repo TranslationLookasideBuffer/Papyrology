@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.Locale;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
 /** A {@link Literal} integer value (e.g. {@code 42}). */
@@ -24,9 +25,6 @@ public abstract class IntegerLiteral implements Literal {
    */
   public abstract boolean isOutOfRange();
 
-  /** Returns the raw value of the literal (as it appears in source). */
-  public abstract String getRawValue();
-
   /** Returns a new {@code IntegerLiteral} based on the given {@link TerminalNode}. */
   public static IntegerLiteral create(TerminalNode node) {
     Token token = node.getSymbol();
@@ -36,9 +34,9 @@ public abstract class IntegerLiteral implements Literal {
         node);
     ParsedValue parsed = parseInteger(token.getText());
     return builder()
+        .setSourceReference(SourceReference.create(node))
         .setValue(parsed.value)
         .setOutOfRange(parsed.isOutOfRange)
-        .setRawValue(token.getText())
         .build();
   }
 
@@ -71,11 +69,11 @@ public abstract class IntegerLiteral implements Literal {
   /** A builder of {@code IntegerLiterals}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setValue(int value);
 
     abstract Builder setOutOfRange(boolean isOutOfRange);
-
-    abstract Builder setRawValue(String rawValue);
 
     abstract IntegerLiteral build();
   }

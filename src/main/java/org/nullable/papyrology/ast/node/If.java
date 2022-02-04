@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.IfContext;
 
 /** A {@link Statement} that defines some series of conditional execution of blocks of code. */
@@ -35,6 +36,7 @@ public abstract class If implements Statement {
     // If an else statement is present, ctx.statementBlock() will have exactly one more element
     // than ctx.expression() and it will be the last element in the list.
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setConditionalBlocks(conditionalBlocks.build())
         .setElseStatements(
             ctx.statementBlock().size() > expressions
@@ -51,6 +53,8 @@ public abstract class If implements Statement {
   /** A builder of {@code Ifs}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setConditionalBlocks(ImmutableList<ConditionalBlock> conditionalBlocks);
 
     abstract Builder setElseStatements(ImmutableList<Statement> elseStatements);

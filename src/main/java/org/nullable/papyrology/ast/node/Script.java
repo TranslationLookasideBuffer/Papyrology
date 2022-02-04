@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.ScriptContext;
 
 /** The top-level construct - an entire Papyrus script. */
@@ -19,6 +20,7 @@ public abstract class Script implements Construct {
   /** Returns a new {@code Script} based on the given {@link ScriptContext}. */
   public static Script create(ScriptContext ctx) {
     return Script.builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setHeader(Header.create(ctx.header()))
         .setDeclarations(
             ctx.declaration().stream().map(Declaration::create).collect(toImmutableList()))
@@ -33,6 +35,8 @@ public abstract class Script implements Construct {
   /** A builder of {@code ScriptNodes}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setHeader(Header header);
 
     abstract Builder setDeclarations(ImmutableList<Declaration> declarations);

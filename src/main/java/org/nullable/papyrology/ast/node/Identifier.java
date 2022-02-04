@@ -6,6 +6,7 @@ import com.google.auto.value.AutoValue;
 import java.util.Locale;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
 /** An {@link Expression} that evaluates to some scoped identifier (e.g. variable name). */
@@ -27,7 +28,10 @@ public abstract class Identifier implements Expression {
         token.getType() == PapyrusParser.ID,
         "Identifier::create passed an unsupported TerminalNode: %s",
         node);
-    return builder().setValue(token.getText()).build();
+    return builder()
+        .setSourceReference(SourceReference.create(node))
+        .setValue(token.getText())
+        .build();
   }
 
   /** Returns a fresh {@code IdentifierNode} builder. */
@@ -38,6 +42,8 @@ public abstract class Identifier implements Expression {
   /** A builder of {@code Identifiers}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setValue(String value);
 
     abstract Identifier build();

@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.DotAccessOrFunctionCallContext;
 import org.nullable.papyrology.grammar.PapyrusParser.LocalFunctionCallContext;
 
@@ -35,6 +36,7 @@ public abstract class FunctionCall implements Expression {
             + " %s",
         ctx);
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setReferenceExpression(Expression.create(ctx.expression()))
         .setIdentifier(Identifier.create(ctx.ID()))
         .setCallParameters(CallParameter.create(ctx.callParameters()))
@@ -44,6 +46,7 @@ public abstract class FunctionCall implements Expression {
   /** Returns a new {@code FunctionCall} based on the given {@link LocalFunctionCallContext}. */
   public static FunctionCall create(LocalFunctionCallContext ctx) {
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setIdentifier(Identifier.create(ctx.ID()))
         .setCallParameters(CallParameter.create(ctx.callParameters()))
         .build();
@@ -57,6 +60,8 @@ public abstract class FunctionCall implements Expression {
   /** A builder of {@code FunctionCalls}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setReferenceExpression(Expression expression);
 
     abstract Builder setIdentifier(Identifier id);

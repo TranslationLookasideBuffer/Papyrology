@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.auto.value.AutoValue;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
 /** A {@link Literal} string value (e.g. {@code "foo"}). */
@@ -21,7 +22,10 @@ public abstract class StringLiteral implements Literal {
         token.getType() == PapyrusParser.L_STRING,
         " StringLiteral::create passed an unsupported TerminalNode: %s",
         node);
-    return builder().setValue(token.getText()).build();
+    return builder()
+        .setSourceReference(SourceReference.create(node))
+        .setValue(token.getText())
+        .build();
   }
 
   /** Returns a fresh {@code StringLiteral} builder. */
@@ -32,6 +36,8 @@ public abstract class StringLiteral implements Literal {
   /** A builder of {@code StringLiterals}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setValue(String value);
 
     abstract StringLiteral build();

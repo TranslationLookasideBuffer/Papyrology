@@ -3,6 +3,7 @@ package org.nullable.papyrology.ast.node;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.auto.value.AutoValue;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.DotAccessOrFunctionCallContext;
 
 /**
@@ -26,6 +27,7 @@ public abstract class DotAccess implements Expression {
             + " %s",
         ctx);
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setReferenceExpression(Expression.create(ctx.expression()))
         .setIdentifier(Identifier.create(ctx.ID()))
         .build();
@@ -39,6 +41,8 @@ public abstract class DotAccess implements Expression {
   /** A builder of {@code DotAccesses}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setReferenceExpression(Expression expression);
 
     abstract Builder setIdentifier(Identifier id);

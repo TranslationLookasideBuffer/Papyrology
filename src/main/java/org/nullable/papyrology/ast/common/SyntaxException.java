@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.common;
 
 import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.annotations.FormatString;
+import org.nullable.papyrology.common.SourceReference;
 
 /** Identifies that there exists a syntax error in the source. */
 public final class SyntaxException extends RuntimeException {

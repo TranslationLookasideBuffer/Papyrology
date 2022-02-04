@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.VariableDeclarationContext;
 
 /** A {@link Declaration} that defines a variable at the script level. */
@@ -24,6 +25,7 @@ public abstract class ScriptVariable implements Declaration {
   public static ScriptVariable create(VariableDeclarationContext ctx) {
     Builder scriptVariable =
         builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setType(Type.create(ctx.type()))
             .setIdentifier(Identifier.create(ctx.ID()))
             .setConditional(!ctx.F_CONDITIONAL().isEmpty());
@@ -41,6 +43,8 @@ public abstract class ScriptVariable implements Declaration {
   /** A builder of {@code ScriptVariables}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setType(Type type);
 
     abstract Builder setIdentifier(Identifier id);

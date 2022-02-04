@@ -1,6 +1,7 @@
 package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.ArrayAccessContext;
 
 /** An {@link Expression} that evaluates to an element in an array. */
@@ -16,6 +17,7 @@ public abstract class ArrayAccess implements Expression {
   /** Returns a new {@code ArrayAccess} based on the given {@link ArrayAccessContext}. */
   public static ArrayAccess create(ArrayAccessContext ctx) {
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setArrayExpression(Expression.create(ctx.expression(0)))
         .setIndexExpression(Expression.create(ctx.expression(1)))
         .build();
@@ -29,6 +31,8 @@ public abstract class ArrayAccess implements Expression {
   /** A builder of {@code ArrayAccesses}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setArrayExpression(Expression expression);
 
     abstract Builder setIndexExpression(Expression expression);

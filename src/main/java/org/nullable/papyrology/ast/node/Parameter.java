@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.ParameterContext;
 import org.nullable.papyrology.grammar.PapyrusParser.ParametersContext;
 
@@ -32,7 +33,10 @@ public abstract class Parameter implements Construct {
   /** Returns a new {@code Parameter} based on the given {@link ParameterContext}. */
   public static Parameter create(ParameterContext ctx) {
     Builder parameter =
-        builder().setType(Type.create(ctx.type())).setIdentifier(Identifier.create(ctx.ID()));
+        builder()
+            .setSourceReference(SourceReference.create(ctx))
+            .setType(Type.create(ctx.type()))
+            .setIdentifier(Identifier.create(ctx.ID()));
     if (ctx.literal() != null) {
       parameter.setDefaultValueLiteral(Literal.create(ctx.literal()));
     }
@@ -47,6 +51,8 @@ public abstract class Parameter implements Construct {
   /** A builder of {@code Parameters}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setType(Type type);
 
     abstract Builder setIdentifier(Identifier id);

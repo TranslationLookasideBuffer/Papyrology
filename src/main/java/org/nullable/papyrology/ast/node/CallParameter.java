@@ -5,6 +5,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.CallParameterContext;
 import org.nullable.papyrology.grammar.PapyrusParser.CallParametersContext;
 
@@ -28,7 +29,10 @@ public abstract class CallParameter implements Construct {
 
   /** Returns a new {@code CallParameter} based on the given {@link CallParameterContext}. */
   public static CallParameter create(CallParameterContext ctx) {
-    Builder parameter = builder().setExpression(Expression.create(ctx.expression()));
+    Builder parameter =
+        builder()
+            .setSourceReference(SourceReference.create(ctx))
+            .setExpression(Expression.create(ctx.expression()));
     if (ctx.ID() != null) {
       parameter.setIdentifier(Identifier.create(ctx.ID()));
     }
@@ -43,6 +47,8 @@ public abstract class CallParameter implements Construct {
   /** A builder of {@code CallParameters}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setIdentifier(Identifier id);
 
     abstract Builder setExpression(Expression expression);

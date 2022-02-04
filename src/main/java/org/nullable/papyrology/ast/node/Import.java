@@ -1,6 +1,7 @@
 package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.ImportDeclarationContext;
 
 /**
@@ -14,7 +15,10 @@ public abstract class Import implements Declaration {
 
   /** Returns a new {@code Import} based on the given {@link ImportDeclarationContext}. */
   public static Import create(ImportDeclarationContext ctx) {
-    return builder().setImportedScriptIdentifier(Identifier.create(ctx.ID())).build();
+    return builder()
+        .setSourceReference(SourceReference.create(ctx))
+        .setImportedScriptIdentifier(Identifier.create(ctx.ID()))
+        .build();
   }
 
   /** Returns a fresh {@code Import} builder. */
@@ -25,6 +29,8 @@ public abstract class Import implements Declaration {
   /** A builder of {@code Imports}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setImportedScriptIdentifier(Identifier id);
 
     abstract Import build();

@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.TypeContext;
 
 /** Defines a data type for a value. */
@@ -34,7 +35,7 @@ public abstract class Type implements Construct {
       type.setDataType(isArray ? DataType.OBJECT_ARRAY : DataType.OBJECT)
           .setIdentifier(Identifier.create(ctx.ID()));
     }
-    return type.build();
+    return type.setSourceReference(SourceReference.create(ctx)).build();
   }
 
   /** Returns a fresh {@code Type} builder. */
@@ -45,6 +46,8 @@ public abstract class Type implements Construct {
   /** A builder of {@code Types}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setDataType(DataType dataType);
 
     abstract Builder setIdentifier(Identifier id);

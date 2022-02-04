@@ -3,6 +3,7 @@ package org.nullable.papyrology.ast.node;
 import com.google.auto.value.AutoValue;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
 /** A {@link Literal} boolean value (e.g. {@code True}). */
@@ -12,17 +13,15 @@ public abstract class BooleanLiteral implements Literal {
   /** Returns the actual value of this literal. */
   public abstract boolean getValue();
 
-  /** Returns the raw value of the literal (as it appears in source). */
-  public abstract String getRawValue();
-
   /** Returns a new {@code BooleanLiteral} based on the given {@link TerminalNode}. */
   public static BooleanLiteral create(TerminalNode node) {
     Token token = node.getSymbol();
+    SourceReference reference = SourceReference.create(node);
     if (token.getType() == PapyrusParser.K_TRUE) {
-      return builder().setValue(true).setRawValue(token.getText()).build();
+      return builder().setSourceReference(reference).setValue(true).build();
     }
     if (token.getType() == PapyrusParser.K_FALSE) {
-      return builder().setValue(false).setRawValue(token.getText()).build();
+      return builder().setSourceReference(reference).setValue(false).build();
     }
     throw new IllegalArgumentException(
         String.format("BooleanLiteral::create passed an unsupported TerminalNode: %s", node));
@@ -36,9 +35,9 @@ public abstract class BooleanLiteral implements Literal {
   /** A builder of {@code BooleanLiterals}. */
   @AutoValue.Builder
   abstract static class Builder {
-    abstract Builder setValue(boolean value);
+    abstract Builder setSourceReference(SourceReference reference);
 
-    abstract Builder setRawValue(String rawValue);
+    abstract Builder setValue(boolean value);
 
     abstract BooleanLiteral build();
   }

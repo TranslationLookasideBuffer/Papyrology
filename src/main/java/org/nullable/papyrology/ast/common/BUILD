@@ -4,6 +4,7 @@ java_library(
     name = "common",
     srcs = glob(["*.java"]),
     deps = [
+        "//src/main/java/org/nullable/papyrology/common",
         "//src/main/third_party:antlr",
         "//src/main/third_party:autovalue",
         "//src/main/third_party:autovalue_annotations",

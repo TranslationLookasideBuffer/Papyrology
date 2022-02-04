@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 import org.nullable.papyrology.grammar.PapyrusParser.BinaryOperationContext;
 
@@ -52,6 +53,7 @@ public abstract class BinaryOperation implements Expression {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());
     checkState(operator != null, "BinaryOperation::create was unable to resolve the operator");
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setOperator(operator)
         .setLeftExpression(Expression.create(ctx.left))
         .setRightExpression(Expression.create(ctx.right))
@@ -72,6 +74,8 @@ public abstract class BinaryOperation implements Expression {
   /** A builder of {@code BinaryOperations}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setOperator(Operator operator);
 
     abstract Builder setLeftExpression(Expression expression);

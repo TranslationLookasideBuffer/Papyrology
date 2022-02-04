@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.HeaderContext;
 
 /** Metadata about a single script. */
@@ -30,6 +31,7 @@ public abstract class Header implements Construct {
   public static Header create(HeaderContext ctx) {
     Builder header =
         builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setScriptIdentifier(Identifier.create(ctx.ID(0)))
             .setHidden(!ctx.F_HIDDEN().isEmpty())
             .setConditional(!ctx.F_CONDITIONAL().isEmpty());
@@ -50,6 +52,8 @@ public abstract class Header implements Construct {
   /** A builder of {@code Headers}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setScriptIdentifier(Identifier id);
 
     abstract Builder setParentScriptIdentifier(Identifier id);

@@ -3,6 +3,7 @@ package org.nullable.papyrology.ast.node;
 import com.google.auto.value.AutoValue;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
 /**
@@ -29,20 +30,18 @@ public abstract class ObjectLiteral implements Literal {
   /** Returns the actual value of this literal. */
   public abstract Reference getValue();
 
-  /** Returns the raw value of the literal (as it appears in source). */
-  public abstract String getRawValue();
-
   /** Returns a new {@code ObjectLiteral} based on the given {@link TerminalNode}. */
   public static ObjectLiteral create(TerminalNode node) {
     Token token = node.getSymbol();
+    Builder literal = builder().setSourceReference(SourceReference.create(node));
     if (token.getType() == PapyrusParser.K_NONE) {
-      return builder().setValue(Reference.NONE).setRawValue(token.getText()).build();
+      return literal.setValue(Reference.NONE).build();
     }
     if (token.getType() == PapyrusParser.K_SELF) {
-      return builder().setValue(Reference.SELF).setRawValue(token.getText()).build();
+      return literal.setValue(Reference.SELF).build();
     }
     if (token.getType() == PapyrusParser.K_PARENT) {
-      return builder().setValue(Reference.PARENT).setRawValue(token.getText()).build();
+      return literal.setValue(Reference.PARENT).build();
     }
     throw new IllegalArgumentException(
         String.format("ObjectLiteral::create passed an unsupported TerminalNode: %s", node));
@@ -56,9 +55,9 @@ public abstract class ObjectLiteral implements Literal {
   /** A builder of {@code ObjectLiterals}. */
   @AutoValue.Builder
   abstract static class Builder {
-    abstract Builder setValue(Reference value);
+    abstract Builder setSourceReference(SourceReference reference);
 
-    abstract Builder setRawValue(String raw);
+    abstract Builder setValue(Reference value);
 
     abstract ObjectLiteral build();
   }

@@ -2,6 +2,7 @@ package org.nullable.papyrology.ast.node;
 
 import com.google.auto.value.AutoValue;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.ReturnContext;
 
 /** A {@link Statement} that causes execution of a function to cease, potentially with a value. */
@@ -13,7 +14,7 @@ public abstract class Return implements Statement {
 
   /** Returns a new {@code Return} based on the given {@link ReturnContext}. */
   public static Return create(ReturnContext ctx) {
-    Builder returnStatement = builder();
+    Builder returnStatement = builder().setSourceReference(SourceReference.create(ctx));
     if (ctx.expression() != null) {
       returnStatement.setValueExpression(Expression.create(ctx.expression()));
     }
@@ -28,6 +29,8 @@ public abstract class Return implements Statement {
   /** A builder of {@code Returns}. */
   @AutoValue.Builder
   public abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setValueExpression(Expression expression);
 
     abstract Return build();

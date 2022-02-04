@@ -3,6 +3,7 @@ package org.nullable.papyrology.ast.node;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import java.util.Optional;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.FunctionContext;
 import org.nullable.papyrology.grammar.PapyrusParser.FunctionDeclarationContext;
 import org.nullable.papyrology.grammar.PapyrusParser.NativeFunctionContext;
@@ -51,6 +52,7 @@ public abstract class Function implements Invokable {
   private static Function create(FunctionContext ctx) {
     Builder function =
         Function.builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setIdentifier(Identifier.create(ctx.ID()))
             .setParameters(Parameter.create(ctx.parameters()))
             .setBodyStatements(Statement.create(ctx.statementBlock()))
@@ -68,6 +70,7 @@ public abstract class Function implements Invokable {
   private static Function create(NativeFunctionContext ctx) {
     Builder function =
         Function.builder()
+            .setSourceReference(SourceReference.create(ctx))
             .setIdentifier(Identifier.create(ctx.ID()))
             .setParameters(Parameter.create(ctx.parameters()))
             .setBodyStatements(ImmutableList.of())
@@ -90,6 +93,8 @@ public abstract class Function implements Invokable {
   /** A builder of {@code Functions}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setReturnType(Type type);
 
     abstract Builder setIdentifier(Identifier id);

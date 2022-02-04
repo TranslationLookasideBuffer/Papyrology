@@ -4,6 +4,7 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import org.nullable.papyrology.common.SourceReference;
 import org.nullable.papyrology.grammar.PapyrusParser.StateDeclarationContext;
 
 /** A {@link Declaration} that defines a script state. */
@@ -25,6 +26,7 @@ public abstract class State implements Declaration {
   /** Returns a new {@code State} based on the given {@link StateDeclarationContext}. */
   public static State create(StateDeclarationContext ctx) {
     return builder()
+        .setSourceReference(SourceReference.create(ctx))
         .setIdentifier(Identifier.create(ctx.ID()))
         .setAuto(ctx.K_AUTO() != null)
         .setInvokables(ctx.invokable().stream().map(Invokable::create).collect(toImmutableList()))
@@ -39,6 +41,8 @@ public abstract class State implements Declaration {
   /** A builder of {@code States}. */
   @AutoValue.Builder
   abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
     abstract Builder setIdentifier(Identifier id);
 
     abstract Builder setInvokables(ImmutableList<Invokable> invokables);
