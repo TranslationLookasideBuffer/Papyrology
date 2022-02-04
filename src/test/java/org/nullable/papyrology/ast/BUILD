@@ -1,6 +1,6 @@
 java_test(
-    name = "ScriptVisitorTest",
-    srcs = ["ScriptVisitorTest.java"],
+    name = "ScriptFactoryTest",
+    srcs = ["ScriptFactoryTest.java"],
     data = [
         "//src/test/scripts",
     ],

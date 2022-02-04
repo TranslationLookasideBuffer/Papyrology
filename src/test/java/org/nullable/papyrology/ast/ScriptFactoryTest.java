@@ -24,12 +24,12 @@ import org.nullable.papyrology.grammar.PapyrusLexer;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
 /**
- * Validates that known good Papyrus scripts are parsable by the {@code ScriptVisitor}.
+ * Validates that known good Papyrus scripts are parsable by the {@code ScriptFactory}.
  *
  * <p>This test will grab all files in {@code src/test/scripts} and run them through the visitor.
  */
 @RunWith(Parameterized.class)
-public class ScriptVisitorTest {
+public class ScriptFactoryTest {
 
   /** Returns the {@link Path Paths} of all scripts under {@code src/test/scripts}. */
   @Parameters(name = "{0}")
@@ -50,18 +50,15 @@ public class ScriptVisitorTest {
   }
 
   @Test
-  public void parse() throws IOException {
+  public void create() throws IOException {
     String content = new String(Files.readAllBytes(path)) + "\n";
     PapyrusLexer lexer = new PapyrusLexer(CharStreams.fromString(content));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     PapyrusParser parser = new PapyrusParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.script();
-    ScriptVisitor visitor = new ScriptVisitor();
 
-    Script script = tree.accept(visitor);
-
-    // System.out.println(script);
+    Script script = ScriptFactory.create(tree);
   }
 
   /**
