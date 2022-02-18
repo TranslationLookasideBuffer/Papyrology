@@ -1,0 +1,55 @@
+package org.nullable.papyrology.ast;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
+import com.google.auto.value.AutoValue;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.Immutable;
+import java.util.Locale;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.nullable.papyrology.grammar.PapyrusParser;
+import org.nullable.papyrology.source.SourceReference;
+
+/** An {@link Expression} that evaluates to some scoped identifier (e.g. variable name). */
+@AutoValue
+@Immutable
+public abstract class Identifier implements Expression {
+
+  /** Returns the value of this identifier. */
+  public abstract String getValue();
+
+  /** Returns whether or not this {@link Identifier} refers to the same entity as the given one. */
+  public final boolean isEquivalent(Identifier other) {
+    return getValue().toUpperCase(Locale.US).equals(other.getValue().toUpperCase(Locale.US));
+  }
+
+  /** Returns a new {@code Identifier} based on the given {@link TerminalNode}. */
+  static Identifier create(TerminalNode node) {
+    Token token = node.getSymbol();
+    checkArgument(
+        token.getType() == PapyrusParser.ID,
+        "Identifier::create passed an unsupported TerminalNode: %s",
+        node);
+    return builder()
+        .setSourceReference(SourceReference.create(node))
+        .setValue(token.getText())
+        .build();
+  }
+
+  /** Returns a fresh {@code IdentifierNode} builder. */
+  static Builder builder() {
+    return new AutoValue_Identifier.Builder();
+  }
+
+  /** A builder of {@code Identifiers}. */
+  @AutoValue.Builder
+  @CanIgnoreReturnValue
+  abstract static class Builder {
+    abstract Builder setSourceReference(SourceReference reference);
+
+    abstract Builder setValue(String value);
+
+    abstract Identifier build();
+  }
+}

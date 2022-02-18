@@ -4,8 +4,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.annotations.FormatString;
-import org.nullable.papyrology.ast.node.Script;
-import org.nullable.papyrology.common.SourceReference;
+import org.nullable.papyrology.ast.Script;
+import org.nullable.papyrology.source.SourceReference;
 
 /** Analyzes a {@link Script} for a particular set of issues. */
 public interface StaticAnalyzer {

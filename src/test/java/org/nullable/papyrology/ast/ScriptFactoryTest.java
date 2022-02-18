@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
-import org.nullable.papyrology.ast.node.Script;
 import org.nullable.papyrology.grammar.PapyrusLexer;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
