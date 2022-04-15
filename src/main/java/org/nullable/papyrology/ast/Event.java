@@ -1,38 +1,24 @@
 package org.nullable.papyrology.ast;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Optional;
 import org.nullable.papyrology.grammar.PapyrusParser.EventContext;
 import org.nullable.papyrology.grammar.PapyrusParser.EventDeclarationContext;
 import org.nullable.papyrology.grammar.PapyrusParser.NativeEventContext;
 import org.nullable.papyrology.source.SourceReference;
+import org.nullable.papyrology.util.Optionals;
 
 /** An {@link Invokable} that conforms to a game-defined callback function. */
-@AutoValue
 @Immutable
-public abstract class Event implements Invokable {
-
-  /** Returns the {@link Identifier} of this event. */
-  public abstract Identifier getIdentifier();
-
-  /** Returns the {@link Parameter Parameters} of this event. */
-  public abstract ImmutableList<Parameter> getParameters();
-
-  /** Returns the {@link Statement Statements} that make up the body of this event. */
-  public abstract ImmutableList<Statement> getBodyStatements();
-
-  /** Returns the documentation comment of this event, if present. */
-  public abstract Optional<String> getComment();
-
-  /**
-   * Returns whether or not this event is native.
-   *
-   * <p>If true, {@link #getBodyStatements()} will return an empty list.s
-   */
-  public abstract boolean isNative();
+public record Event(
+    SourceReference sourceReference,
+    Identifier identifier,
+    ImmutableList<Parameter> parameters,
+    ImmutableList<Statement> bodyStatements,
+    Optional<String> comment,
+    boolean isNative)
+    implements Invokable {
 
   /** Returns a new {@code Event} based on the given {@link EventDeclarationContext}. */
   static Event create(EventDeclarationContext ctx) {
@@ -47,53 +33,24 @@ public abstract class Event implements Invokable {
   }
 
   private static Event create(EventContext ctx) {
-    Builder event =
-        Event.builder()
-            .setSourceReference(SourceReference.create(ctx))
-            .setIdentifier(Identifier.create(ctx.ID()))
-            .setParameters(Parameter.create(ctx.parameters()))
-            .setBodyStatements(Statement.create(ctx.statementBlock()))
-            .setNative(false);
-    if (ctx.docComment() != null) {
-      event.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
-    }
-    return event.build();
+    return new Event(
+        SourceReference.create(ctx),
+        Identifier.create(ctx.ID()),
+        Parameter.create(ctx.parameters()),
+        Statement.create(ctx.statementBlock()),
+        Optionals.of(
+            ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
+        false);
   }
 
   private static Event create(NativeEventContext ctx) {
-    Builder event =
-        Event.builder()
-            .setSourceReference(SourceReference.create(ctx))
-            .setIdentifier(Identifier.create(ctx.ID()))
-            .setParameters(Parameter.create(ctx.parameters()))
-            .setNative(true);
-    if (ctx.docComment() != null) {
-      event.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
-    }
-    return event.build();
-  }
-
-  /** Returns a fresh {@code Event} builder. */
-  static Builder builder() {
-    return new AutoValue_Event.Builder();
-  }
-
-  /** A builder of {@code Events}. */
-  @AutoValue.Builder
-  @CanIgnoreReturnValue
-  abstract static class Builder {
-    abstract Builder setSourceReference(SourceReference reference);
-
-    abstract Builder setIdentifier(Identifier id);
-
-    abstract Builder setParameters(ImmutableList<Parameter> parameters);
-
-    abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
-
-    abstract Builder setComment(String comment);
-
-    abstract Builder setNative(boolean isNative);
-
-    abstract Event build();
+    return new Event(
+        SourceReference.create(ctx),
+        Identifier.create(ctx.ID()),
+        Parameter.create(ctx.parameters()),
+        ImmutableList.of(),
+        Optionals.of(
+            ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
+        true);
   }
 }

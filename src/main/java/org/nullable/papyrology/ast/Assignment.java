@@ -3,9 +3,7 @@ package org.nullable.papyrology.ast;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.auto.value.AutoOneOf;
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import org.nullable.papyrology.grammar.PapyrusParser;
 import org.nullable.papyrology.grammar.PapyrusParser.ArrayAccessAssigneeContext;
@@ -16,9 +14,13 @@ import org.nullable.papyrology.grammar.PapyrusParser.IdentifierAssigneeContext;
 import org.nullable.papyrology.source.SourceReference;
 
 /** A {@link Statement} that updates the value of a variable or property. */
-@AutoValue
 @Immutable
-public abstract class Assignment implements Statement {
+public record Assignment(
+    SourceReference sourceReference,
+    Assignee assignee,
+    Operator operator,
+    Expression valueExpression)
+    implements Statement {
 
   /** Which "flavor" of assignment this represents. */
   public enum Operator {
@@ -40,45 +42,15 @@ public abstract class Assignment implements Statement {
           .put(PapyrusParser.O_ASSIGN_MODULO, Operator.ASSIGN_MODULO)
           .build();
 
-  /** Returns the {@link Assignee} that is being updated. */
-  public abstract Assignee getAssignee();
-
-  /** Returns the {@link Operator} that is being used for this assignment. */
-  public abstract Operator getOperator();
-
-  /** Returns the {@link Expression} that evaluates to the value being assigned. */
-  public abstract Expression getValueExpression();
-
   /** Returns a new {@code Assignment} based on the given {@link AssignmentContext}. */
   static Assignment create(AssignmentContext ctx) {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());
     checkState(operator != null, "Assignment::create was unable to resolve the operator");
-    return builder()
-        .setSourceReference(SourceReference.create(ctx))
-        .setAssignee(Assignee.create(ctx.assignee()))
-        .setOperator(operator)
-        .setValueExpression(Expression.create(ctx.expression()))
-        .build();
-  }
-
-  /** Returns a fresh {@code Assignment} builder. */
-  static Builder builder() {
-    return new AutoValue_Assignment.Builder();
-  }
-
-  /** A builder of {@code Assignments}. */
-  @AutoValue.Builder
-  @CanIgnoreReturnValue
-  abstract static class Builder {
-    abstract Builder setSourceReference(SourceReference reference);
-
-    abstract Builder setAssignee(Assignee assignee);
-
-    abstract Builder setOperator(Operator operator);
-
-    abstract Builder setValueExpression(Expression expression);
-
-    abstract Assignment build();
+    return new Assignment(
+        SourceReference.create(ctx),
+        Assignee.create(ctx.assignee()),
+        operator,
+        Expression.create(ctx.expression()));
   }
 
   /** A one-of representing the variable/property being updated. */
@@ -118,19 +90,11 @@ public abstract class Assignment implements Statement {
     }
 
     static Assignee create(DotAccessAssigneeContext ctx) {
-      return AutoOneOf_Assignment_Assignee.dotAccess(
-          DotAccess.builder()
-              .setReferenceExpression(Expression.create(ctx.expression()))
-              .setIdentifier(Identifier.create(ctx.ID()))
-              .build());
+      return AutoOneOf_Assignment_Assignee.dotAccess(DotAccess.create(ctx));
     }
 
     static Assignee create(ArrayAccessAssigneeContext ctx) {
-      return AutoOneOf_Assignment_Assignee.arrayAccess(
-          ArrayAccess.builder()
-              .setArrayExpression(Expression.create(ctx.expression(0)))
-              .setIndexExpression(Expression.create(ctx.expression(1)))
-              .build());
+      return AutoOneOf_Assignment_Assignee.arrayAccess(ArrayAccess.create(ctx));
     }
   }
 }

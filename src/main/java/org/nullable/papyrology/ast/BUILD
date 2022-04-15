@@ -6,6 +6,7 @@ java_library(
     deps = [
         "//src/main/java/org/nullable/papyrology/grammar",
         "//src/main/java/org/nullable/papyrology/source",
+        "//src/main/java/org/nullable/papyrology/util",
         "//src/main/third_party:antlr",
         "//src/main/third_party:autovalue",
         "//src/main/third_party:autovalue_annotations",

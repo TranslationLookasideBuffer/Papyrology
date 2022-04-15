@@ -8,5 +8,5 @@ import org.nullable.papyrology.source.SourceReference;
 public interface Construct {
 
   /** Returns the {@link SourceReference} for this construct. */
-  SourceReference getSourceReference();
+  SourceReference sourceReference();
 }

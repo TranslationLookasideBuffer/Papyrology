@@ -2,18 +2,20 @@ package org.nullable.papyrology.ast;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import org.nullable.papyrology.grammar.PapyrusParser;
 import org.nullable.papyrology.grammar.PapyrusParser.BinaryOperationContext;
 import org.nullable.papyrology.source.SourceReference;
 
 /** An {@link Expression} that evaluates to the result of an operation on two inputs. */
-@AutoValue
 @Immutable
-public abstract class BinaryOperation implements Expression {
+public record BinaryOperation(
+    SourceReference sourceReference,
+    Operator operator,
+    Expression leftExpression,
+    Expression rightExpression)
+    implements Expression {
 
   public enum Operator {
     LOGICAL_OR,
@@ -48,44 +50,14 @@ public abstract class BinaryOperation implements Expression {
           .put(PapyrusParser.O_MODULO, Operator.MODULO)
           .build();
 
-  /** Returns the {@link Operator} of this operation. */
-  public abstract Operator getOperator();
-
   /** Returns a new {@code BinaryOperation} based on the given {@link BinaryOperationContext}. */
   static BinaryOperation create(BinaryOperationContext ctx) {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());
     checkState(operator != null, "BinaryOperation::create was unable to resolve the operator");
-    return builder()
-        .setSourceReference(SourceReference.create(ctx))
-        .setOperator(operator)
-        .setLeftExpression(Expression.create(ctx.left))
-        .setRightExpression(Expression.create(ctx.right))
-        .build();
-  }
-
-  /** Returns the {@link Expression} that on the left of the {@code Operator}. */
-  public abstract Expression getLeftExpression();
-
-  /** Returns the {@link Expression} that on the right of the {@code Operator}. */
-  public abstract Expression getRightExpression();
-
-  /** Returns a fresh {@code BinaryOperation} builder. */
-  static Builder builder() {
-    return new AutoValue_BinaryOperation.Builder();
-  }
-
-  /** A builder of {@code BinaryOperations}. */
-  @AutoValue.Builder
-  @CanIgnoreReturnValue
-  abstract static class Builder {
-    abstract Builder setSourceReference(SourceReference reference);
-
-    abstract Builder setOperator(Operator operator);
-
-    abstract Builder setLeftExpression(Expression expression);
-
-    abstract Builder setRightExpression(Expression expression);
-
-    abstract BinaryOperation build();
+    return new BinaryOperation(
+        SourceReference.create(ctx),
+        operator,
+        Expression.create(ctx.left),
+        Expression.create(ctx.right));
   }
 }

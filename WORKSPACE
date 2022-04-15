@@ -1,3 +1,5 @@
+register_toolchains("//:repository_default_toolchain_definition")
+
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
@@ -51,7 +53,7 @@ maven_install(
         "com.google.truth:truth:1.1.3",
         "com.google.guava:guava:31.0.1-jre",
         "com.google.truth.extensions:truth-java8-extension:1.1.3",
-        "com.google.googlejavaformat:google-java-format:1.12.0",
+        "com.google.googlejavaformat:google-java-format:1.15.0",
         "com.google.auto.value:auto-value-annotations:1.9",
         "com.google.auto.value:auto-value:1.9",
         "com.google.errorprone:error_prone_annotations:2.10.0",

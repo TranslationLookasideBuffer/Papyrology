@@ -1,44 +1,28 @@
 package org.nullable.papyrology.ast;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Optional;
 import org.nullable.papyrology.grammar.PapyrusParser.FunctionContext;
 import org.nullable.papyrology.grammar.PapyrusParser.FunctionDeclarationContext;
+import org.nullable.papyrology.grammar.PapyrusParser.GetPropertyFunctionContext;
 import org.nullable.papyrology.grammar.PapyrusParser.NativeFunctionContext;
+import org.nullable.papyrology.grammar.PapyrusParser.SetPropertyFunctionContext;
 import org.nullable.papyrology.source.SourceReference;
+import org.nullable.papyrology.util.Optionals;
 
 /** An {@link Invokable} that defines a unit of work that may be called by scripts. */
-@AutoValue
 @Immutable
-public abstract class Function implements Invokable {
-
-  /** Returns the return {@link Type} of this function, if present. */
-  public abstract Optional<Type> getReturnType();
-
-  /** Returns the {@link Identifier} of this function. */
-  public abstract Identifier getIdentifier();
-
-  /** Returns the {@link Parameter Parameters} of this function. */
-  public abstract ImmutableList<Parameter> getParameters();
-
-  /** Returns the {@link Statement Statements} that make up the body of this function. */
-  public abstract ImmutableList<Statement> getBodyStatements();
-
-  /** Returns the documentation comment of this function, if present. */
-  public abstract Optional<String> getComment();
-
-  /** Returns whether or not this function is global. */
-  public abstract boolean isGlobal();
-
-  /**
-   * Returns whether or not this function is native.
-   *
-   * <p>If true, {@link #getBodyStatements()} will return an empty list.s
-   */
-  public abstract boolean isNative();
+public record Function(
+    SourceReference sourceReference,
+    Optional<Type> returnType,
+    Identifier identifier,
+    ImmutableList<Parameter> parameters,
+    ImmutableList<Statement> bodyStatements,
+    Optional<String> comment,
+    boolean isGlobal,
+    boolean isNative)
+    implements Invokable {
 
   /** Returns a new {@code Function} based on the given {@link FunctionDeclarationContext}. */
   static Function create(FunctionDeclarationContext ctx) {
@@ -53,66 +37,68 @@ public abstract class Function implements Invokable {
   }
 
   private static Function create(FunctionContext ctx) {
-    Builder function =
-        Function.builder()
-            .setSourceReference(SourceReference.create(ctx))
-            .setIdentifier(Identifier.create(ctx.ID()))
-            .setParameters(Parameter.create(ctx.parameters()))
-            .setBodyStatements(Statement.create(ctx.statementBlock()))
-            .setGlobal(ctx.K_GLOBAL() != null)
-            .setNative(false);
-    if (ctx.docComment() != null) {
-      function.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
-    }
-    if (ctx.type() != null) {
-      function.setReturnType(Type.create(ctx.type()));
-    }
-    return function.build();
+    return new Function(
+        SourceReference.create(ctx),
+        Optionals.of(ctx.type() != null, () -> Type.create(ctx.type())),
+        Identifier.create(ctx.ID()),
+        Parameter.create(ctx.parameters()),
+        Statement.create(ctx.statementBlock()),
+        Optionals.of(
+            ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
+        ctx.K_GLOBAL() != null,
+        /* isNative= */ false);
   }
 
   private static Function create(NativeFunctionContext ctx) {
-    Builder function =
-        Function.builder()
-            .setSourceReference(SourceReference.create(ctx))
-            .setIdentifier(Identifier.create(ctx.ID()))
-            .setParameters(Parameter.create(ctx.parameters()))
-            .setBodyStatements(ImmutableList.of())
-            .setGlobal(!ctx.K_GLOBAL().isEmpty())
-            .setNative(true);
-    if (ctx.docComment() != null) {
-      function.setComment(ctx.docComment().DOC_COMMENT().getSymbol().getText());
+    return new Function(
+        SourceReference.create(ctx),
+        Optionals.of(ctx.type() != null, () -> Type.create(ctx.type())),
+        Identifier.create(ctx.ID()),
+        Parameter.create(ctx.parameters()),
+        /* bodyStatements= */ ImmutableList.of(),
+        Optionals.of(
+            ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
+        !ctx.K_GLOBAL().isEmpty(),
+        /* isNative= */ true);
+  }
+
+  static Function create(GetPropertyFunctionContext ctx) {
+    Identifier identifier = Identifier.create(ctx.ID());
+    if (!identifier.isEquivalent(GET_IDENTIFIER)) {
+      throw new SyntaxException(
+          SourceReference.create(ctx), "Property function must be named \"Get\" or equivalent");
     }
-    if (ctx.type() != null) {
-      function.setReturnType(Type.create(ctx.type()));
+    return new Function(
+        SourceReference.create(ctx),
+        Optional.of(Type.create(ctx.type())),
+        identifier,
+        /* parameters= */ ImmutableList.of(),
+        Statement.create(ctx.statementBlock()),
+        Optionals.of(
+            ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
+        /* isGlobal= */ false,
+        /* isNative= */ false);
+  }
+
+  private static final String GET_IDENTIFIER = "Get";
+
+  static Function create(SetPropertyFunctionContext ctx) {
+    Identifier identifier = Identifier.create(ctx.ID());
+    if (!identifier.isEquivalent(SET_IDENTIFIER)) {
+      throw new SyntaxException(
+          SourceReference.create(ctx), "Property function must be named \"Set\" or equivalent");
     }
-    return function.build();
+    return new Function(
+        SourceReference.create(ctx),
+        /* returnType= */ Optional.empty(),
+        identifier,
+        ImmutableList.of(Parameter.create(ctx.parameter())),
+        Statement.create(ctx.statementBlock()),
+        Optionals.of(
+            ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
+        /* isGlobal= */ false,
+        /* isNative= */ false);
   }
 
-  /** Returns a fresh {@code Function} builder. */
-  static Builder builder() {
-    return new AutoValue_Function.Builder();
-  }
-
-  /** A builder of {@code Functions}. */
-  @AutoValue.Builder
-  @CanIgnoreReturnValue
-  abstract static class Builder {
-    abstract Builder setSourceReference(SourceReference reference);
-
-    abstract Builder setReturnType(Type type);
-
-    abstract Builder setIdentifier(Identifier id);
-
-    abstract Builder setParameters(ImmutableList<Parameter> parameters);
-
-    abstract Builder setBodyStatements(ImmutableList<Statement> bodyStatements);
-
-    abstract Builder setComment(String comment);
-
-    abstract Builder setGlobal(boolean isGlobal);
-
-    abstract Builder setNative(boolean isNative);
-
-    abstract Function build();
-  }
+  private static final String SET_IDENTIFIER = "Set";
 }

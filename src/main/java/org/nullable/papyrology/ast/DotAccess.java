@@ -2,9 +2,8 @@ package org.nullable.papyrology.ast;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.auto.value.AutoValue;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
+import org.nullable.papyrology.grammar.PapyrusParser.DotAccessAssigneeContext;
 import org.nullable.papyrology.grammar.PapyrusParser.DotAccessOrFunctionCallContext;
 import org.nullable.papyrology.source.SourceReference;
 
@@ -12,15 +11,10 @@ import org.nullable.papyrology.source.SourceReference;
  * An {@link Expression} that evaluates to the value of some variable or property belonging to
  * another object
  */
-@AutoValue
 @Immutable
-public abstract class DotAccess implements Expression {
-
-  /** Returns the {@link Expression} that evaluates to the reference being accessed. */
-  public abstract Expression getReferenceExpression();
-
-  /** Returns the {@link Identifier} of the property/variable being accessed. */
-  public abstract Identifier getIdentifier();
+public record DotAccess(
+    SourceReference sourceReference, Expression referenceExpression, Identifier identifier)
+    implements Expression {
 
   /** Returns a new {@code DocAccess} based on the given {@link DotAccessOrFunctionCallContext}. */
   static DotAccess create(DotAccessOrFunctionCallContext ctx) {
@@ -29,28 +23,17 @@ public abstract class DotAccess implements Expression {
         "DotAccess::create passed a DotAccessOrFunctionCallContext that maps to a function call:"
             + " %s",
         ctx);
-    return builder()
-        .setSourceReference(SourceReference.create(ctx))
-        .setReferenceExpression(Expression.create(ctx.expression()))
-        .setIdentifier(Identifier.create(ctx.ID()))
-        .build();
+    return new DotAccess(
+        SourceReference.create(ctx),
+        Expression.create(ctx.expression()),
+        Identifier.create(ctx.ID()));
   }
 
-  /** Returns a fresh {@code DotAccess} builder. */
-  static Builder builder() {
-    return new AutoValue_DotAccess.Builder();
-  }
-
-  /** A builder of {@code DotAccesses}. */
-  @AutoValue.Builder
-  @CanIgnoreReturnValue
-  abstract static class Builder {
-    abstract Builder setSourceReference(SourceReference reference);
-
-    abstract Builder setReferenceExpression(Expression expression);
-
-    abstract Builder setIdentifier(Identifier id);
-
-    abstract DotAccess build();
+  /** Returns a new {@code DocAccess} based on the given {@link DotAccessAssigneeContext}. */
+  static DotAccess create(DotAccessAssigneeContext ctx) {
+    return new DotAccess(
+        SourceReference.create(ctx),
+        Expression.create(ctx.expression()),
+        Identifier.create(ctx.ID()));
   }
 }

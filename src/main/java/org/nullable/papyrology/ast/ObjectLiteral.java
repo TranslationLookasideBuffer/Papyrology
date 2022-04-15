@@ -1,7 +1,5 @@
 package org.nullable.papyrology.ast;
 
-import com.google.auto.value.AutoValue;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -19,9 +17,8 @@ import org.nullable.papyrology.source.SourceReference;
  *   <li>{@code Parent}, the reference to the script the current one extends
  * </ul>
  */
-@AutoValue
 @Immutable
-public abstract class ObjectLiteral implements Literal {
+public record ObjectLiteral(SourceReference sourceReference, Reference value) implements Literal {
 
   /** The type of this node. */
   public enum Reference {
@@ -30,39 +27,20 @@ public abstract class ObjectLiteral implements Literal {
     PARENT
   }
 
-  /** Returns the actual value of this literal. */
-  public abstract Reference getValue();
-
   /** Returns a new {@code ObjectLiteral} based on the given {@link TerminalNode}. */
   static ObjectLiteral create(TerminalNode node) {
     Token token = node.getSymbol();
-    Builder literal = builder().setSourceReference(SourceReference.create(node));
+    SourceReference sourceReference = SourceReference.create(node);
     if (token.getType() == PapyrusParser.K_NONE) {
-      return literal.setValue(Reference.NONE).build();
+      return new ObjectLiteral(sourceReference, Reference.NONE);
     }
     if (token.getType() == PapyrusParser.K_SELF) {
-      return literal.setValue(Reference.SELF).build();
+      return new ObjectLiteral(sourceReference, Reference.SELF);
     }
     if (token.getType() == PapyrusParser.K_PARENT) {
-      return literal.setValue(Reference.PARENT).build();
+      return new ObjectLiteral(sourceReference, Reference.PARENT);
     }
     throw new IllegalArgumentException(
         String.format("ObjectLiteral::create passed an unsupported TerminalNode: %s", node));
-  }
-
-  /** Returns a fresh {@code ObjectLiteral} builder. */
-  static Builder builder() {
-    return new AutoValue_ObjectLiteral.Builder();
-  }
-
-  /** A builder of {@code ObjectLiterals}. */
-  @AutoValue.Builder
-  @CanIgnoreReturnValue
-  abstract static class Builder {
-    abstract Builder setSourceReference(SourceReference reference);
-
-    abstract Builder setValue(Reference value);
-
-    abstract ObjectLiteral build();
   }
 }

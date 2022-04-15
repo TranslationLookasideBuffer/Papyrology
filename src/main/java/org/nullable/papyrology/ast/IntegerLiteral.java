@@ -2,8 +2,6 @@ package org.nullable.papyrology.ast;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.auto.value.AutoValue;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
 import java.math.BigInteger;
 import java.util.Locale;
@@ -12,21 +10,16 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.nullable.papyrology.grammar.PapyrusParser;
 import org.nullable.papyrology.source.SourceReference;
 
-/** A {@link Literal} integer value (e.g. {@code 42}). */
-@AutoValue
+/**
+ * A {@link Literal} integer value (e.g. {@code 42}).
+ *
+ * <p>Note: Papyrus allows defining integers that are far outside the valid range of a 32-bit
+ * integer. If {@link #isOutOfRange()} returns {@code true}, {@link #value()} will return either
+ * {@link Integer#MAX_VALUE} or {@link Integer#MIN_VALUE}.
+ */
 @Immutable
-public abstract class IntegerLiteral implements Literal {
-
-  /** Returns the actual value of this literal. */
-  public abstract int getValue();
-
-  /**
-   * Returns whether or not this integer value was out of the 32-bit signed integer range.
-   *
-   * <p>If this returns {@code true}, {@link #getValue()} will return either {@link
-   * Integer#MAX_VALUE} or {@link Integer#MIN_VALUE}.
-   */
-  public abstract boolean isOutOfRange();
+public record IntegerLiteral(SourceReference sourceReference, int value, boolean isOutOfRange)
+    implements Literal {
 
   /** Returns a new {@code IntegerLiteral} based on the given {@link TerminalNode}. */
   static IntegerLiteral create(TerminalNode node) {
@@ -36,11 +29,7 @@ public abstract class IntegerLiteral implements Literal {
         " IntegerLiteral::create passed an unsupported TerminalNode: %s",
         node);
     ParsedValue parsed = parseInteger(token.getText());
-    return builder()
-        .setSourceReference(SourceReference.create(node))
-        .setValue(parsed.value)
-        .setOutOfRange(parsed.isOutOfRange)
-        .build();
+    return new IntegerLiteral(SourceReference.create(node), parsed.value(), parsed.isOutOfRange());
   }
 
   /**
@@ -64,31 +53,5 @@ public abstract class IntegerLiteral implements Literal {
   private static final BigInteger MAX_VALUE = BigInteger.valueOf(Integer.MAX_VALUE);
   private static final BigInteger MIN_VALUE = BigInteger.valueOf(Integer.MIN_VALUE);
 
-  /** Returns a fresh {@code IntegerLiteral} builder. */
-  static Builder builder() {
-    return new AutoValue_IntegerLiteral.Builder();
-  }
-
-  /** A builder of {@code IntegerLiterals}. */
-  @AutoValue.Builder
-  @CanIgnoreReturnValue
-  abstract static class Builder {
-    abstract Builder setSourceReference(SourceReference reference);
-
-    abstract Builder setValue(int value);
-
-    abstract Builder setOutOfRange(boolean isOutOfRange);
-
-    abstract IntegerLiteral build();
-  }
-
-  private static class ParsedValue {
-    private final int value;
-    private final boolean isOutOfRange;
-
-    ParsedValue(int value, boolean isOutOfRange) {
-      this.value = value;
-      this.isOutOfRange = isOutOfRange;
-    }
-  }
+  private static record ParsedValue(int value, boolean isOutOfRange) {}
 }
