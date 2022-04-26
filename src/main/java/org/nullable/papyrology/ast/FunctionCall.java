@@ -18,6 +18,11 @@ public record FunctionCall(
     ImmutableList<CallParameter> callParameters)
     implements Expression {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /**
    * Returns a new {@code FunctionCall} based on the given {@link DotAccessOrFunctionCallContext}.
    */

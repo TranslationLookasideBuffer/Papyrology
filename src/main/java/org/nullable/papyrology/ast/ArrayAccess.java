@@ -11,6 +11,11 @@ public record ArrayAccess(
     SourceReference sourceReference, Expression arrayExpression, Expression indexExpression)
     implements Expression {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code ArrayAccess} based on the given {@link ArrayAccessContext}. */
   static ArrayAccess create(ArrayAccessContext ctx) {
     return new ArrayAccess(

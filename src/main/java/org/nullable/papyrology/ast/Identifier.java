@@ -13,6 +13,11 @@ import org.nullable.papyrology.source.SourceReference;
 @Immutable
 public record Identifier(SourceReference sourceReference, String value) implements Expression {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns whether or not this {@link Identifier} refers to the same entity as the given one. */
   public final boolean isEquivalent(Identifier other) {
     return value().toUpperCase(Locale.US).equals(other.value().toUpperCase(Locale.US));

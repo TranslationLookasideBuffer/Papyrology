@@ -50,6 +50,11 @@ public record BinaryOperation(
           .put(PapyrusParser.O_MODULO, Operator.MODULO)
           .build();
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code BinaryOperation} based on the given {@link BinaryOperationContext}. */
   static BinaryOperation create(BinaryOperationContext ctx) {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());

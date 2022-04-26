@@ -10,6 +10,11 @@ import org.nullable.papyrology.source.SourceReference;
 @Immutable
 public record BooleanLiteral(SourceReference sourceReference, boolean value) implements Literal {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code BooleanLiteral} based on the given {@link TerminalNode}. */
   static BooleanLiteral create(TerminalNode node) {
     Token token = node.getSymbol();

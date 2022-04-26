@@ -15,6 +15,11 @@ public record Variable(
     Optional<Expression> valueExpression)
     implements Statement {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Variable} based on the given {@link LocalVariableContext}. */
   static Variable create(LocalVariableContext ctx) {
     return new Variable(

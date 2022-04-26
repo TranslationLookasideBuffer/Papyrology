@@ -16,6 +16,11 @@ public record ScriptVariable(
     boolean isConditional)
     implements Declaration {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code ScriptVariable} based on the given {@link VariableDeclarationContext}. */
   static ScriptVariable create(VariableDeclarationContext ctx) {
     return new ScriptVariable(

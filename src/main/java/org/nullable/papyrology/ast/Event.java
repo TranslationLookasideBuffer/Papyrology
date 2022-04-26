@@ -20,6 +20,11 @@ public record Event(
     boolean isNative)
     implements Invokable {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Event} based on the given {@link EventDeclarationContext}. */
   static Event create(EventDeclarationContext ctx) {
     if (ctx instanceof EventContext) {

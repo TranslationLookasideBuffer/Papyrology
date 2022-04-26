@@ -19,6 +19,11 @@ public record Parameter(
     Optional<Literal> defaultValueLiteral)
     implements Construct {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a list of {@code Parameters} based on the given {@link ParametersContext}. */
   static ImmutableList<Parameter> create(ParametersContext ctx) {
     if (ctx.parameter() == null) {

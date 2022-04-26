@@ -16,6 +16,11 @@ public record DotAccess(
     SourceReference sourceReference, Expression referenceExpression, Identifier identifier)
     implements Expression {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code DocAccess} based on the given {@link DotAccessOrFunctionCallContext}. */
   static DotAccess create(DotAccessOrFunctionCallContext ctx) {
     checkArgument(

@@ -25,6 +25,11 @@ public record UnaryOperation(
           .put(PapyrusParser.O_LOGICAL_NOT, Operator.LOGICAL_NEGATION)
           .build();
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code UnaryOperation} based on the given {@link UnaryOperationContext}. */
   static UnaryOperation create(UnaryOperationContext ctx) {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());

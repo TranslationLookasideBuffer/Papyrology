@@ -16,6 +16,11 @@ public record Type(
     SourceReference sourceReference, DataType dataType, Optional<Identifier> identifier)
     implements Construct {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Type} based on the given {@link TypeContext}. */
   static Type create(TypeContext ctx) {
     boolean isArray = ctx.S_LBRAKET() != null;

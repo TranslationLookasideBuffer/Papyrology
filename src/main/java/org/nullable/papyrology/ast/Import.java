@@ -11,6 +11,11 @@ import org.nullable.papyrology.source.SourceReference;
 public record Import(SourceReference sourceReference, Identifier importedScriptIdentifier)
     implements Declaration {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Import} based on the given {@link ImportDeclarationContext}. */
   static Import create(ImportDeclarationContext ctx) {
     return new Import(SourceReference.create(ctx), Identifier.create(ctx.ID()));

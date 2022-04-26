@@ -44,6 +44,11 @@ public record Property(
     boolean isConditional)
     implements Declaration {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Property} based on the given {@link PropertyDeclarationContext}. */
   static Property create(PropertyDeclarationContext ctx) {
     if (ctx instanceof FullPropertyContext) {

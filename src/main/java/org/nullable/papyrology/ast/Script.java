@@ -13,6 +13,11 @@ public record Script(
     SourceReference sourceReference, Header header, ImmutableList<Declaration> declarations)
     implements Construct {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Script} based on the given {@link ScriptContext}. */
   static Script create(ScriptContext ctx) {
     return new Script(

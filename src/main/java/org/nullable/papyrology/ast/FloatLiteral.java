@@ -12,6 +12,11 @@ import org.nullable.papyrology.source.SourceReference;
 @Immutable
 public record FloatLiteral(SourceReference sourceReference, float value) implements Literal {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code FloatLiteral} based on the given {@link TerminalNode}. */
   static FloatLiteral create(TerminalNode node) {
     Token token = node.getSymbol();

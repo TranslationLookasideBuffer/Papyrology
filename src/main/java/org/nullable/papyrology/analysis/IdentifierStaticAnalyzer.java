@@ -1,7 +1,11 @@
 package org.nullable.papyrology.analysis;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.function.Function;
+import org.nullable.papyrology.ast.Declaration;
 import org.nullable.papyrology.ast.Script;
 
 /** A {@link StaticAnalyzer} that resolves and validates identifiers. */
@@ -19,8 +23,14 @@ public class IdentifierStaticAnalyzer implements StaticAnalyzer {
 
   @Override
   public ImmutableList<Issue> analyze(Script script) {
+    return script.declarations().stream()
+        .map(this::analyze)
+        .flatMap(List::stream)
+        .collect(toImmutableList());
+  }
 
-    return ImmutableList.of();
+  private List<Issue> analyze(Declaration declaration) {
+    return null;
   }
 
   private static class IdentifierResolver {

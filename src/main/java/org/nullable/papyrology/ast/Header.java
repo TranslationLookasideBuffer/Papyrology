@@ -17,6 +17,11 @@ public record Header(
     Optional<String> comment)
     implements Construct {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Header} based on the given {@link HeaderContext}. */
   static Header create(HeaderContext ctx) {
     return new Header(

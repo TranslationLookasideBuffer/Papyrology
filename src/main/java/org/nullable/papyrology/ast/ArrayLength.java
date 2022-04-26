@@ -9,6 +9,11 @@ import org.nullable.papyrology.source.SourceReference;
 public record ArrayLength(SourceReference sourceReference, Expression arrayExpression)
     implements Expression {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code ArrayLength} based on the given {@link ArrayLengthContext}. */
   static ArrayLength create(ArrayLengthContext ctx) {
     return new ArrayLength(SourceReference.create(ctx), Expression.create(ctx.expression()));

@@ -9,4 +9,7 @@ public interface Construct {
 
   /** Returns the {@link SourceReference} for this construct. */
   SourceReference sourceReference();
+
+  /** Visits this {@code Construct}. */
+  <T> T accept(Visitor<T> visitor);
 }

@@ -24,6 +24,11 @@ public record Function(
     boolean isNative)
     implements Invokable {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Function} based on the given {@link FunctionDeclarationContext}. */
   static Function create(FunctionDeclarationContext ctx) {
     if (ctx instanceof FunctionContext) {

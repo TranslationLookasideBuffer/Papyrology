@@ -21,6 +21,11 @@ import org.nullable.papyrology.source.SourceReference;
 public record IntegerLiteral(SourceReference sourceReference, int value, boolean isOutOfRange)
     implements Literal {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code IntegerLiteral} based on the given {@link TerminalNode}. */
   static IntegerLiteral create(TerminalNode node) {
     Token token = node.getSymbol();

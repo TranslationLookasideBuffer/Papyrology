@@ -27,6 +27,11 @@ public record ObjectLiteral(SourceReference sourceReference, Reference value) im
     PARENT
   }
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code ObjectLiteral} based on the given {@link TerminalNode}. */
   static ObjectLiteral create(TerminalNode node) {
     Token token = node.getSymbol();

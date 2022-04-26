@@ -13,6 +13,11 @@ public record While(
     ImmutableList<Statement> bodyStatements)
     implements Statement {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code While} based on the given {@link WhileContext}. */
   static While create(WhileContext ctx) {
     return new While(

@@ -16,6 +16,11 @@ public record State(
     boolean isAuto)
     implements Declaration {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code State} based on the given {@link StateDeclarationContext}. */
   static State create(StateDeclarationContext ctx) {
     return new State(

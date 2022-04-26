@@ -9,6 +9,11 @@ import org.nullable.papyrology.source.SourceReference;
 public record ArrayInitialization(SourceReference sourceReference, Type type, IntegerLiteral size)
     implements Expression {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /**
    * Returns a new {@code ArrayInitialization} based on the given {@link
    * ArrayInitializationContext}.

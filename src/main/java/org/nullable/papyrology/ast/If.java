@@ -13,6 +13,11 @@ public record If(
     ImmutableList<Statement> elseStatements)
     implements Statement {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code If} based on the given {@link IfContext}. */
   static If create(IfContext ctx) {
     ImmutableList.Builder<ConditionalBlock> conditionalBlocks = ImmutableList.builder();

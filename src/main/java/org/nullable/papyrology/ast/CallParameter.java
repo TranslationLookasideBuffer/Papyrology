@@ -16,6 +16,11 @@ public record CallParameter(
     SourceReference sourceReference, Optional<Identifier> identifier, Expression expression)
     implements Construct {
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a list of {@code CallParameters} based on the given {@link CallParametersContext}. */
   static ImmutableList<CallParameter> create(CallParametersContext ctx) {
     if (ctx.callParameter() == null) {

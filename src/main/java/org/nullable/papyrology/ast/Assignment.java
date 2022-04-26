@@ -42,6 +42,11 @@ public record Assignment(
           .put(PapyrusParser.O_ASSIGN_MODULO, Operator.ASSIGN_MODULO)
           .build();
 
+  @Override
+  public final <T> T accept(Visitor<T> visitor) {
+    return visitor.visit(this);
+  }
+
   /** Returns a new {@code Assignment} based on the given {@link AssignmentContext}. */
   static Assignment create(AssignmentContext ctx) {
     Operator operator = TOKEN_TYPES_TO_OPERATORS.get(ctx.op.getType());
@@ -63,13 +68,27 @@ public record Assignment(
       ARRAY_ACCESS
     }
 
-    public abstract Type getType();
+    public abstract Type type();
 
-    public abstract Identifier getIdentifier();
+    public abstract Identifier identifier();
 
-    public abstract DotAccess getDotAccess();
+    public abstract DotAccess dotAccess();
 
-    public abstract ArrayAccess getArrayAccess();
+    public abstract ArrayAccess arrayAccess();
+
+    public final <T> T accept(Visitor<T> visitor) {
+      switch (type()) {
+        case IDENTIFIER:
+          return identifier().accept(visitor);
+        case DOT_ACCESS:
+          return dotAccess().accept(visitor);
+        case ARRAY_ACCESS:
+          return arrayAccess().accept(visitor);
+        default:
+          throw new IllegalStateException(
+              String.format("Assignee:::accept encountered invalid type: %s", type()));
+      }
+    }
 
     static Assignee create(AssigneeContext ctx) {
       if (ctx instanceof IdentifierAssigneeContext) {
