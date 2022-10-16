@@ -18,6 +18,9 @@ public interface Visitor<T> {
   /** Visit a {@link BinaryOperation}. */
   T visit(BinaryOperation binaryOperation);
 
+  /** Visit a {@link Block}. */
+  T visit(Block block);
+
   /** Visit a {@link BooleanLiteral}. */
   T visit(BooleanLiteral booleanLiteral);
 

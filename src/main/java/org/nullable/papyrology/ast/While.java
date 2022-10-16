@@ -1,16 +1,14 @@
 package org.nullable.papyrology.ast;
 
-import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
+import java.util.Optional;
 import org.nullable.papyrology.grammar.PapyrusParser.WhileContext;
 import org.nullable.papyrology.source.SourceReference;
 
 /** A {@link Statement} that defines a repeated, conditional execution of a block of code. */
 @Immutable
 public record While(
-    SourceReference sourceReference,
-    Expression conditionalExpression,
-    ImmutableList<Statement> bodyStatements)
+    SourceReference sourceReference, Expression conditionalExpression, Optional<Block> body)
     implements Statement {
 
   @Override
@@ -23,6 +21,6 @@ public record While(
     return new While(
         SourceReference.create(ctx),
         Expression.create(ctx.expression()),
-        Statement.create(ctx.statementBlock()));
+        Optional.of(Block.create(ctx.statementBlock())));
   }
 }
