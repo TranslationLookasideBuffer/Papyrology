@@ -4,6 +4,7 @@ java_test(
     data = [
         "//src/test/scripts",
     ],
+    jvm_flags = ["--enable-preview"],
     deps = [
         "//src/main/java/org/nullable/papyrology/ast",
         "//src/main/java/org/nullable/papyrology/grammar",

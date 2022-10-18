@@ -58,6 +58,8 @@ public class ScriptFactoryTest {
     ParseTree tree = parser.script();
 
     Script script = ScriptFactory.create(tree);
+
+    script.accept(WalkingVisitor.create(new IdentifierWalker()));
   }
 
   /**
@@ -79,6 +81,13 @@ public class ScriptFactoryTest {
                 "Encountered syntax error on line %d at char %d: %s",
                 line, charPositionInLine, e.getMessage()));
       }
+    }
+  }
+
+  private static class IdentifierWalker extends WalkingVisitor.Walker {
+    @Override
+    protected void touch(Identifier identifier) {
+      System.out.println(identifier.value());
     }
   }
 }

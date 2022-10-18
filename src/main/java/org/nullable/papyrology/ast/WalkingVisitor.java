@@ -280,37 +280,78 @@ public final class WalkingVisitor implements Visitor {
   // The following methods are needed to satisfy the compiler, but are never actually invoked.
 
   private final void visit(Literal literal) {
-    throw new IllegalArgumentException(
-        String.format(
-            "ScriptWalker::visit passed an unsupported Literal: %s", literal.getClass().getName()));
+    switch (literal) {
+      case BooleanLiteral b -> visit(b);
+      case FloatLiteral f -> visit(f);
+      case IntegerLiteral i -> visit(i);
+      case StringLiteral s -> visit(s);
+      case ObjectLiteral o -> visit(o);
+      default -> throw new IllegalArgumentException(
+          String.format(
+              "ScriptWalker::visit passed an unsupported Literal: %s",
+              literal.getClass().getName()));
+    }
   }
 
   private final void visit(Declaration declaration) {
-    throw new IllegalArgumentException(
-        String.format(
-            "ScriptWalker::visit passed an unsupported Declaration: %s",
-            declaration.getClass().getName()));
+    switch (declaration) {
+      case Event e -> visit(e);
+      case Function f -> visit(f);
+      case Import i -> visit(i);
+      case Property p -> visit(p);
+      case ScriptVariable v -> visit(v);
+      case State s -> visit(s);
+      default -> throw new IllegalArgumentException(
+          String.format(
+              "ScriptWalker::visit passed an unsupported Declaration: %s",
+              declaration.getClass().getName()));
+    }
   }
 
   private final void visit(Expression expression) {
-    throw new IllegalArgumentException(
-        String.format(
-            "ScriptWalker::visit passed an unsupported Expression: %s",
-            expression.getClass().getName()));
+    switch (expression) {
+      case ArrayAccess a -> visit(a);
+      case ArrayInitialization i -> visit(i);
+      case ArrayLength l -> visit(l);
+      case BinaryOperation b -> visit(b);
+      case Cast c -> visit(c);
+      case DotAccess d -> visit(d);
+      case FunctionCall f -> visit(f);
+      case Identifier i -> visit(i);
+      case Literal l -> visit(l);
+      case Parenthetical p -> visit(p);
+      case UnaryOperation u -> visit(u);
+      default -> throw new IllegalArgumentException(
+          String.format(
+              "ScriptWalker::visit passed an unsupported Expression: %s",
+              expression.getClass().getName()));
+    }
   }
 
   private final void visit(Invokable invokable) {
-    throw new IllegalArgumentException(
-        String.format(
-            "ScriptWalker::visit passed an unsupported Invokable: %s",
-            invokable.getClass().getName()));
+    switch (invokable) {
+      case Event e -> visit(e);
+      case Function f -> visit(f);
+      default -> throw new IllegalArgumentException(
+          String.format(
+              "ScriptWalker::visit passed an unsupported Invokable: %s",
+              invokable.getClass().getName()));
+    }
   }
 
   private final void visit(Statement statement) {
-    throw new IllegalArgumentException(
-        String.format(
-            "ScriptWalker::visit passed an unsupported Statement: %s",
-            statement.getClass().getName()));
+    switch (statement) {
+      case Assignment a -> visit(a);
+      case Expression e -> visit(e);
+      case If i -> visit(i);
+      case Return r -> visit(r);
+      case Variable v -> visit(v);
+      case While w -> visit(w);
+      default -> throw new IllegalArgumentException(
+          String.format(
+              "ScriptWalker::visit passed an unsupported Statement: %s",
+              statement.getClass().getName()));
+    }
   }
 
   /**
