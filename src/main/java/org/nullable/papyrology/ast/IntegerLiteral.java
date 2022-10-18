@@ -22,8 +22,8 @@ public record IntegerLiteral(SourceReference sourceReference, int value, boolean
     implements Literal {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code IntegerLiteral} based on the given {@link TerminalNode}. */

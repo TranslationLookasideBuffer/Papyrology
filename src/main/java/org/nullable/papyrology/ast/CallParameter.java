@@ -17,8 +17,8 @@ public record CallParameter(
     implements Construct {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a list of {@code CallParameters} based on the given {@link CallParametersContext}. */

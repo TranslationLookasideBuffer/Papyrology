@@ -14,8 +14,8 @@ import org.nullable.papyrology.source.SourceReference;
 public record Identifier(SourceReference sourceReference, String value) implements Expression {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns whether or not this {@link Identifier} refers to the same entity as the given one. */

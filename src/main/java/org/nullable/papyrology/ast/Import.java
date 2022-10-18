@@ -12,8 +12,8 @@ public record Import(SourceReference sourceReference, Identifier importedScriptI
     implements Declaration {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code Import} based on the given {@link ImportDeclarationContext}. */

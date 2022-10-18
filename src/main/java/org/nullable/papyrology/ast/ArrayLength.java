@@ -10,8 +10,8 @@ public record ArrayLength(SourceReference sourceReference, Expression arrayExpre
     implements Expression {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code ArrayLength} based on the given {@link ArrayLengthContext}. */

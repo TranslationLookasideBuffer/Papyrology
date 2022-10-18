@@ -32,10 +32,17 @@ public class Scope {
       this.hasSymbol = hasSymbol;
     }
 
+    /**
+     * Whether or not this {@code Type} of {@code Scope} will always have a parent {@code Scope}.
+     */
     public boolean hasParent() {
       return hasParent;
     }
 
+    /**
+     * Whether or not this {@code Type} of {@code Scope} will always have a {@link Symbol} that
+     * identifies it.
+     */
     public boolean hasSymbol() {
       return hasSymbol;
     }

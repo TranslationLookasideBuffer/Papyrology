@@ -16,8 +16,8 @@ public record Variable(
     implements Statement {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code Variable} based on the given {@link LocalVariableContext}. */

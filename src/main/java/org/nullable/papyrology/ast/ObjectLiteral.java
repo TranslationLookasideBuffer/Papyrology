@@ -28,8 +28,8 @@ public record ObjectLiteral(SourceReference sourceReference, Reference value) im
   }
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code ObjectLiteral} based on the given {@link TerminalNode}. */

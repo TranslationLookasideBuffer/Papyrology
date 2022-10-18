@@ -20,8 +20,8 @@ public record Parameter(
     implements Construct {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a list of {@code Parameters} based on the given {@link ParametersContext}. */

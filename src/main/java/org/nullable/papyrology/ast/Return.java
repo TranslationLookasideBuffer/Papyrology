@@ -12,8 +12,8 @@ public record Return(SourceReference sourceReference, Optional<Expression> value
     implements Statement {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code Return} based on the given {@link ReturnContext}. */

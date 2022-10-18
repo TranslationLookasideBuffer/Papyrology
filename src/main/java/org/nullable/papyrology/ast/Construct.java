@@ -11,5 +11,5 @@ public interface Construct {
   SourceReference sourceReference();
 
   /** Visits this {@code Construct}. */
-  <T> T accept(Visitor<T> visitor);
+  void accept(Visitor visitor);
 }

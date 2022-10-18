@@ -43,8 +43,8 @@ public record Assignment(
           .build();
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code Assignment} based on the given {@link AssignmentContext}. */
@@ -75,20 +75,6 @@ public record Assignment(
     public abstract DotAccess dotAccess();
 
     public abstract ArrayAccess arrayAccess();
-
-    public final <T> T accept(Visitor<T> visitor) {
-      switch (type()) {
-        case IDENTIFIER:
-          return identifier().accept(visitor);
-        case DOT_ACCESS:
-          return dotAccess().accept(visitor);
-        case ARRAY_ACCESS:
-          return arrayAccess().accept(visitor);
-        default:
-          throw new IllegalStateException(
-              String.format("Assignee:::accept encountered invalid type: %s", type()));
-      }
-    }
 
     static Assignee create(AssigneeContext ctx) {
       if (ctx instanceof IdentifierAssigneeContext) {

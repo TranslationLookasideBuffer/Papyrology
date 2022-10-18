@@ -15,14 +15,14 @@ public record Event(
     SourceReference sourceReference,
     Identifier identifier,
     ImmutableList<Parameter> parameters,
-    ImmutableList<Statement> bodyStatements,
+    Optional<Block> body,
     Optional<String> comment,
     boolean isNative)
     implements Invokable {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code Event} based on the given {@link EventDeclarationContext}. */
@@ -42,7 +42,7 @@ public record Event(
         SourceReference.create(ctx),
         Identifier.create(ctx.ID()),
         Parameter.create(ctx.parameters()),
-        Statement.create(ctx.statementBlock()),
+        Optional.of(Block.create(ctx.statementBlock())),
         Optionals.of(
             ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
         false);
@@ -53,7 +53,7 @@ public record Event(
         SourceReference.create(ctx),
         Identifier.create(ctx.ID()),
         Parameter.create(ctx.parameters()),
-        ImmutableList.of(),
+        Optional.empty(),
         Optionals.of(
             ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
         true);

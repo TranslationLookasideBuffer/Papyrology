@@ -18,15 +18,15 @@ public record Function(
     Optional<Type> returnType,
     Identifier identifier,
     ImmutableList<Parameter> parameters,
-    ImmutableList<Statement> bodyStatements,
+    Optional<Block> body,
     Optional<String> comment,
     boolean isGlobal,
     boolean isNative)
     implements Invokable {
 
   @Override
-  public final <T> T accept(Visitor<T> visitor) {
-    return visitor.visit(this);
+  public final void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
   /** Returns a new {@code Function} based on the given {@link FunctionDeclarationContext}. */
@@ -47,7 +47,7 @@ public record Function(
         Optionals.of(ctx.type() != null, () -> Type.create(ctx.type())),
         Identifier.create(ctx.ID()),
         Parameter.create(ctx.parameters()),
-        Statement.create(ctx.statementBlock()),
+        Optional.of(Block.create(ctx.statementBlock())),
         Optionals.of(
             ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
         ctx.K_GLOBAL() != null,
@@ -60,7 +60,7 @@ public record Function(
         Optionals.of(ctx.type() != null, () -> Type.create(ctx.type())),
         Identifier.create(ctx.ID()),
         Parameter.create(ctx.parameters()),
-        /* bodyStatements= */ ImmutableList.of(),
+        /* bodyStatements= */ Optional.empty(),
         Optionals.of(
             ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
         !ctx.K_GLOBAL().isEmpty(),
@@ -78,7 +78,7 @@ public record Function(
         Optional.of(Type.create(ctx.type())),
         identifier,
         /* parameters= */ ImmutableList.of(),
-        Statement.create(ctx.statementBlock()),
+        Optional.of(Block.create(ctx.statementBlock())),
         Optionals.of(
             ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
         /* isGlobal= */ false,
@@ -98,7 +98,7 @@ public record Function(
         /* returnType= */ Optional.empty(),
         identifier,
         ImmutableList.of(Parameter.create(ctx.parameter())),
-        Statement.create(ctx.statementBlock()),
+        Optional.of(Block.create(ctx.statementBlock())),
         Optionals.of(
             ctx.docComment() != null, () -> ctx.docComment().DOC_COMMENT().getSymbol().getText()),
         /* isGlobal= */ false,
