@@ -3,7 +3,7 @@ package org.nullable.papyrology.ast.scope;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.errorprone.annotations.Immutable;
+import com.google.common.collect.ImmutableSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -13,12 +13,10 @@ import org.nullable.papyrology.ast.SyntaxException;
 import org.nullable.papyrology.source.SourceReference;
 
 /** A scope of {@code Symbols}.s */
-@Immutable
-public class Scope {
+public class Scope implements Resolver {
   /** The type associated with a {@code Scope}. */
   public enum Type {
-    GLOBAL(false, false),
-    SCRIPT(true, true),
+    SCRIPT(false, true),
     STATE(true, true),
     FUNCTION(true, true),
     EVENT(true, true),
@@ -49,7 +47,7 @@ public class Scope {
   }
 
   private final Type type;
-  private final Scope parent;
+  private final Resolver parent;
   private final Symbol symbol;
   private final ImmutableMap<String, Symbol> symbols;
 
@@ -62,13 +60,11 @@ public class Scope {
 
   /**
    * Returns a new {@link Builder} for a {@code Scope} with the given {@link Type} which is
-   * contained in the {@code Parent} {@code Scope} and identified by the given {@link Symbol}.
+   * contained in the {@code parent} {@code Resolver} and identified by the given {@link Symbol}.
    */
-  public static Builder builder(Type type, Scope parent, Symbol symbol) {
+  public static Builder builder(Type type, Resolver parent, Symbol symbol) {
     checkArgument(
-        type.hasParent(),
-        "Scope::builder called with Type %s which cannot have a parent Scope",
-        type);
+        type.hasParent(), "Scope::builder called with Type %s which cannot have a parent.", type);
     checkArgument(
         type.hasSymbol(), "Scope::builder called with Type %s which cannot have a Symbol", type);
     return new Builder(type, parent, symbol);
@@ -76,13 +72,11 @@ public class Scope {
 
   /**
    * Returns a new {@link Builder} for a {@code Scope} with the given {@link Type} which is
-   * contained in the {@code Parent} {@code Scope}.
+   * contained in the {@code parent} {@code Resolver}.
    */
-  public static Builder builder(Type type, Scope parent) {
+  public static Builder builder(Type type, Resolver parent) {
     checkArgument(
-        type.hasParent(),
-        "Scope::builder called with Type %s which cannot have a parent Scope",
-        type);
+        type.hasParent(), "Scope::builder called with Type %s which cannot have a parent.", type);
     checkArgument(
         !type.hasSymbol(), "Scope::builder called with Type %s which must have a Symbol", type);
     return new Builder(type, parent, null);
@@ -94,23 +88,10 @@ public class Scope {
    */
   public static Builder builder(Type type, Symbol symbol) {
     checkArgument(
-        !type.hasParent(),
-        "Scope::builder called with Type %s which must have a parent Scope",
-        type);
+        !type.hasParent(), "Scope::builder called with Type %s which must have a parent.", type);
     checkArgument(
         type.hasSymbol(), "Scope::builder called with Type %s which cannot have a Symbol", type);
     return new Builder(type, null, symbol);
-  }
-
-  /** Returns a new {@link Builder} for a {@code Scope} with the given {@link Type}. */
-  public static Builder builder(Type type) {
-    checkArgument(
-        !type.hasParent(),
-        "Scope::builder called with Type %s which must have a parent Scope",
-        type);
-    checkArgument(
-        !type.hasSymbol(), "Scope::builder called with Type %s which must have a Symbol", type);
-    return new Builder(type, null, null);
   }
 
   /** Returns the {@link Type} of this {@code Scope}. */
@@ -124,10 +105,20 @@ public class Scope {
   }
 
   /**
-   * Resolves the given {@link Identifier} to a {@link Symbol}.
+   * Returns the set of {@link Symbol Symbols} that this {@code Scope} exports to the global scope.
    *
-   * @throws SyntaxException if no {@code Symbol} could be found.
+   * <p>This method will return an empty set if this {@code Scope} is not a {@link Type#SCRIPT}.
    */
+  public ImmutableSet<Symbol> globals() {
+    if (!type.equals(Type.SCRIPT)) {
+      return ImmutableSet.of();
+    }
+    return symbols.values().stream()
+        .filter(s -> s.isGlobal())
+        .collect(ImmutableSet.toImmutableSet());
+  }
+
+  @Override
   public Symbol resolve(Identifier identifier) {
     String key = toKey(identifier);
     if (!symbols.containsKey(key)) {
@@ -143,11 +134,11 @@ public class Scope {
   /** A builder of {@code Scope} instances. */
   public static class Builder {
     private final Type type;
-    private final Scope parent;
+    private final Resolver parent;
     private final Symbol symbol;
     private final Map<String, Symbol> symbols;
 
-    private Builder(Type type, Scope parent, Symbol symbol) {
+    private Builder(Type type, Resolver parent, Symbol symbol) {
       this.type = type;
       this.parent = parent;
       this.symbol = symbol;
@@ -159,7 +150,11 @@ public class Scope {
      *
      * @throws SyntaxException if the {@code identifier} is already defined in this table.
      */
-    public Builder put(Identifier identifier, Symbol.Type type) {
+    public Builder put(Identifier identifier, Symbol.Type type, boolean isGlobal) {
+      checkArgument(
+          (isGlobal && this.type.equals(Type.SCRIPT)) || !isGlobal,
+          "Symbols within a scope of type %s cannot be global.",
+          this.type);
       String key = toKey(identifier);
       Symbol existing = symbols.get(key);
       if (existing != null) {
@@ -171,7 +166,7 @@ public class Scope {
             existingRef.getLine(),
             existingRef.getColumn());
       }
-      symbols.put(key, new Symbol(type, identifier));
+      symbols.put(key, new Symbol(type, identifier, isGlobal));
       return this;
     }
 
