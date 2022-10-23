@@ -20,9 +20,12 @@ public record Script(
 
   /** Returns a new {@code Script} based on the given {@link ScriptContext}. */
   static Script create(ScriptContext ctx) {
-    return new Script(
-        SourceReference.create(ctx),
-        Header.create(ctx.header()),
-        ctx.declaration().stream().map(Declaration::create).collect(toImmutableList()));
+    SourceReference sourceReference = SourceReference.create(ctx);
+    ImmutableList<Declaration> declarations =
+        ctx.declaration().stream().map(Declaration::create).collect(toImmutableList());
+    if (declarations.stream().filter(d -> d instanceof State s && s.isAuto()).count() > 1) {
+      throw new SyntaxException(sourceReference, "Cannot specify multiple auto States.");
+    }
+    return new Script(sourceReference, Header.create(ctx.header()), declarations);
   }
 }

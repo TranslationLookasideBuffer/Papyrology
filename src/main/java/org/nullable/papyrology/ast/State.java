@@ -23,10 +23,16 @@ public record State(
 
   /** Returns a new {@code State} based on the given {@link StateDeclarationContext}. */
   static State create(StateDeclarationContext ctx) {
+    SourceReference sourceReference = SourceReference.create(ctx);
+    ImmutableList<Invokable> invokables =
+        ctx.invokable().stream().map(Invokable::create).collect(toImmutableList());
+    if (invokables.stream().anyMatch(i -> i instanceof Function f && f.isGlobal())) {
+      throw new SyntaxException(sourceReference, "Cannot define global Functions within a State.");
+    }
     return new State(
-        SourceReference.create(ctx),
+       sourceReference,
         Identifier.create(ctx.ID()),
-        ctx.invokable().stream().map(Invokable::create).collect(toImmutableList()),
+        invokables,
         ctx.K_AUTO() != null);
   }
 }

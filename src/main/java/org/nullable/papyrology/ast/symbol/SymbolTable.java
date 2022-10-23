@@ -19,7 +19,7 @@ import org.nullable.papyrology.ast.WalkingVisitor;
  *
  * <p>This symbol table only supports the {@link #upsert(Script)} operation for mutation which
  * allows for reloading a single {@link Script} without recomputing the entire symbol table.
- * 
+ *
  * <p>NOTE: This class is <i>not</i> thread-safe in any state.
  */
 public final class SymbolTable {
@@ -77,7 +77,7 @@ public final class SymbolTable {
    * <p>If the {@code Script} has a name that matches the name of a {@code Script} already known to
    * the {@code SymbolTable}, the {@code Symbol} information of the existing {@code Script} is
    * removed and replaced by the new {@code Script}.
-   * 
+   *
    * @return {@code true} if this call replaced an existing {@code Script}, {@code false} otherwise.
    */
   @CanIgnoreReturnValue
