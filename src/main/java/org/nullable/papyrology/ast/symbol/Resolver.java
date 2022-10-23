@@ -4,6 +4,7 @@ import org.nullable.papyrology.ast.Identifier;
 import org.nullable.papyrology.ast.SyntaxException;
 
 /** Common interface for resolving an {@link Identifier} to a {@link Symbol}. */
+@FunctionalInterface
 public interface Resolver {
   /**
    * Resolves the given {@link Identifier} to a {@link Symbol}.

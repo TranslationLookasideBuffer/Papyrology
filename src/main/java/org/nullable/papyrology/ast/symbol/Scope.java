@@ -12,7 +12,12 @@ import org.nullable.papyrology.ast.Identifier;
 import org.nullable.papyrology.ast.SyntaxException;
 import org.nullable.papyrology.source.SourceReference;
 
-/** A scope of {@code Symbols}.s */
+/**
+ * A scope of {@code Symbols}.
+ *
+ * <p>NOTE: This class is <i>not</i> thread safe before {@link #lock()} has been called, thus a
+ * {@code Scope} should only have {@link Symbol Symbols} inserted by one thread.
+ */
 final class Scope implements Resolver {
   /** The type associated with a {@code Scope}. */
   public enum Type {
@@ -35,12 +40,14 @@ final class Scope implements Resolver {
   private final Resolver parent;
   private final Symbol symbol;
   private final Map<String, Symbol> symbols;
+  private boolean lock;
 
   private Scope(Type type, Resolver parent, Symbol symbol) {
     this.type = type;
     this.parent = parent;
     this.symbol = symbol;
     this.symbols = new LinkedHashMap<>();
+    this.lock = false;
   }
 
   /**
@@ -65,6 +72,7 @@ final class Scope implements Resolver {
 
   @Override
   public Symbol resolve(Identifier identifier) {
+    checkState(lock, "Scope::resolve called before Script::lock.");
     String key = toKey(identifier);
     if (!symbols.containsKey(key)) {
       if (parent == null) {
@@ -101,6 +109,7 @@ final class Scope implements Resolver {
    * <p>This method will return an empty set if this {@code Scope} is not a {@link Type#SCRIPT}.
    */
   ImmutableSet<Symbol> globals() {
+    checkState(lock, "Scope::globals called before Script::lock.");
     if (!type.equals(Type.SCRIPT)) {
       return ImmutableSet.of();
     }
@@ -110,11 +119,20 @@ final class Scope implements Resolver {
   }
 
   /**
+   * Locks this {@code Scope} so no more {@link Symbol Symbols} can be added and the {@Code Scope}
+   * can be queried.
+   */
+  void lock() {
+    lock = true;
+  }
+
+  /**
    * Inserts the given {@link Symbol} into this {@code Scope}.
    *
    * @throws SyntaxException if the {@code Symbol} is already defined in this {@code Scope}.
    */
-  void put(Symbol symbol) {
+  void insert(Symbol symbol) {
+    checkState(!lock, "Scope::insert called after Script::lock.");
     String key = toKey(symbol.identifier());
     Symbol existing = symbols.get(key);
     if (existing != null) {
