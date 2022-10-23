@@ -19,6 +19,8 @@ import org.nullable.papyrology.ast.WalkingVisitor;
  *
  * <p>This symbol table only supports the {@link #upsert(Script)} operation for mutation which
  * allows for reloading a single {@link Script} without recomputing the entire symbol table.
+ * 
+ * <p>NOTE: This class is <i>not</i> thread-safe in any state.
  */
 public final class SymbolTable {
 
@@ -75,22 +77,26 @@ public final class SymbolTable {
    * <p>If the {@code Script} has a name that matches the name of a {@code Script} already known to
    * the {@code SymbolTable}, the {@code Symbol} information of the existing {@code Script} is
    * removed and replaced by the new {@code Script}.
+   * 
+   * @return {@code true} if this call replaced an existing {@code Script}, {@code false} otherwise.
    */
-  public void upsert(Script script) {
+  @CanIgnoreReturnValue
+  public boolean upsert(Script script) {
     String name = normalize(script.header().scriptIdentifier());
-    remove(name);
+    boolean removal = remove(name);
     ScriptWalker walker = ScriptWalker.create(globalResolver);
     WalkingVisitor.create(walker).visit(script);
     ScriptScope scriptScope = ScriptScope.create(walker.root(), walker.scopes().keySet());
     scriptScopesByName.put(name, scriptScope);
     scopesByConstruct.putAll(walker.scopes());
+    return removal;
   }
 
   /**
    * Removes all {@link Symbol Symbols} from the {@code SymbolTable} that are associated with a
    * {@link Script} with given {@code name}.
    *
-   * @return true if {@code Symbols} were removed, false otherwise.
+   * @return {@code true} if {@code Symbols} were removed, {@code false} otherwise.
    */
   @CanIgnoreReturnValue
   public boolean remove(String name) {
