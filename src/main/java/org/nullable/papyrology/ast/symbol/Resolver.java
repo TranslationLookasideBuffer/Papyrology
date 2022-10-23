@@ -1,4 +1,4 @@
-package org.nullable.papyrology.ast.scope;
+package org.nullable.papyrology.ast.symbol;
 
 import org.nullable.papyrology.ast.Identifier;
 import org.nullable.papyrology.ast.SyntaxException;

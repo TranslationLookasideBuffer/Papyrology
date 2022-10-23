@@ -1,4 +1,4 @@
-package org.nullable.papyrology.ast.scope;
+package org.nullable.papyrology.ast.symbol;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
