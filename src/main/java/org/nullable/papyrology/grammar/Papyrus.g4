@@ -11,8 +11,8 @@ variableDeclaration: type ID (O_ASSIGN literal)? F_CONDITIONAL* NEWLINE;
 stateDeclaration:    K_AUTO? K_STATE ID NEWLINE (invokable | NEWLINE)* K_END_STATE NEWLINE;
 invokable:           functionDeclaration | eventDeclaration;
 eventDeclaration
-    : K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE? docComment? statementBlock K_END_EVENT NEWLINE # Event
-    | K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE docComment? NEWLINE                             # NativeEvent
+    : K_EVENT ID S_LPAREN parameters S_RPAREN docComment? statementBlock K_END_EVENT NEWLINE # Event
+    | K_EVENT ID S_LPAREN parameters S_RPAREN K_NATIVE docComment? NEWLINE                   # NativeEvent
     ;
 propertyDeclaration
     : type K_PROPERTY ID F_HIDDEN? docComment? NEWLINE+ propertyFunction NEWLINE* propertyFunction? NEWLINE* K_END_PROPERTY NEWLINE # FullProperty
