@@ -10,7 +10,6 @@ import org.nullable.papyrology.ast.Block;
 import org.nullable.papyrology.ast.Construct;
 import org.nullable.papyrology.ast.Event;
 import org.nullable.papyrology.ast.Function;
-import org.nullable.papyrology.ast.If;
 import org.nullable.papyrology.ast.Import;
 import org.nullable.papyrology.ast.Parameter;
 import org.nullable.papyrology.ast.Property;
@@ -74,7 +73,8 @@ final class ScriptWalker extends WalkingVisitor.Walker {
   @Override
   protected void enter(Property property) {
     Symbol symbol;
-    if (property.isAuto() || (property.getFunction().isPresent() && property.setFunction().isPresent())) {
+    if (property.isAuto()
+        || (property.getFunction().isPresent() && property.setFunction().isPresent())) {
       symbol = Symbol.readWriteProperty(property.identifier(), property.type().dataType());
     } else if (property.isAutoReadOnly() || property.getFunction().isPresent()) {
       symbol = Symbol.readOnlyProperty(property.identifier(), property.type().dataType());
