@@ -1,7 +1,9 @@
 package org.nullable.papyrology.ast.symbol;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.HashMap;
@@ -109,6 +111,15 @@ public final class SymbolTable {
     return true;
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add(
+            "Scopes",
+            scriptScopesByName.values().stream().map(s -> s.scope).collect(toImmutableList()))
+        .toString();
+  }
+
   /**
    * A simple wrapper around a {@link Scope} (typed {@link Scope.Type#SCRIPT}), and the set of
    * {@link Construct Constructs} it has symbol information for.
@@ -135,6 +146,13 @@ public final class SymbolTable {
             identifier.sourceReference(), "Unable to resolve %s", identifier.value());
       }
       return scriptScopesByName.get(id).scope().symbol();
+    }
+
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this)
+          .add("Scripts", scriptScopesByName.keySet())
+          .toString();
     }
   }
 

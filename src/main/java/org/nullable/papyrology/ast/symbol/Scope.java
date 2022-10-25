@@ -3,6 +3,8 @@ package org.nullable.papyrology.ast.symbol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.MoreObjects.ToStringHelper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.LinkedHashMap;
@@ -150,5 +152,17 @@ final class Scope implements Resolver {
 
   private static final String toKey(Identifier identifier) {
     return identifier.value().toUpperCase(Locale.US);
+  }
+
+  @Override
+  public String toString() {
+    ToStringHelper helper = MoreObjects.toStringHelper(this).add("Type", type).add("Locked", lock);
+    if (symbol != null) {
+      helper.add("Symbol", symbol);
+    }
+    if (parent != null) {
+      helper.add("Parent", parent);
+    }
+    return helper.add("Symbols", symbols).toString();
   }
 }

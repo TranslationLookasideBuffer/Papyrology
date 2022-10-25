@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 java_library(
-    name = "scope",
+    name = "symbol",
     srcs = glob(["*.java"]),
     deps = [
         "//src/main/java/org/nullable/papyrology/ast",

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.nullable.papyrology.ast.Block;
 import org.nullable.papyrology.ast.Construct;
+import org.nullable.papyrology.ast.DataType;
 import org.nullable.papyrology.ast.Event;
 import org.nullable.papyrology.ast.Function;
 import org.nullable.papyrology.ast.Import;
@@ -16,6 +17,7 @@ import org.nullable.papyrology.ast.Property;
 import org.nullable.papyrology.ast.Script;
 import org.nullable.papyrology.ast.ScriptVariable;
 import org.nullable.papyrology.ast.State;
+import org.nullable.papyrology.ast.Type;
 import org.nullable.papyrology.ast.Variable;
 import org.nullable.papyrology.ast.WalkingVisitor;
 
@@ -36,7 +38,6 @@ final class ScriptWalker extends WalkingVisitor.Walker {
     this.root = null;
     this.scopesByConstruct = new HashMap<>();
     this.scopes = new ArrayDeque<>();
-    this.isAnonymousBlock = false;
   }
 
   /** Returns a new {@code ScriptWalker} ready to walk a {@link Script}. */
@@ -117,10 +118,11 @@ final class ScriptWalker extends WalkingVisitor.Walker {
 
   @Override
   protected void enter(Function function) {
+    DataType dataType = function.returnType().map(Type::dataType).orElse(DataType.VOID);
     Symbol symbol =
         function.isGlobal()
-            ? Symbol.globalFunction(function.identifier())
-            : Symbol.function(function.identifier());
+            ? Symbol.globalFunction(function.identifier(), dataType)
+            : Symbol.function(function.identifier(), dataType);
     scopes.peek().insert(symbol);
     Scope scope = Scope.create(scopes.peek(), symbol);
     scopes.push(scope);
@@ -144,11 +146,6 @@ final class ScriptWalker extends WalkingVisitor.Walker {
     Scope scope = scopes.pop();
     scope.lock();
     scopesByConstruct.put(block, scope);
-  }
-
-  @Override
-  protected void enter(Variable variable) {
-    scopes.peek().insert(Symbol.variable(variable.identifier(), variable.type().dataType()));
   }
 
   @Override

@@ -19,6 +19,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.nullable.papyrology.ast.symbol.SymbolTable;
 import org.nullable.papyrology.grammar.PapyrusLexer;
 import org.nullable.papyrology.grammar.PapyrusParser;
 
@@ -59,7 +60,8 @@ public class ScriptFactoryTest {
 
     Script script = ScriptFactory.create(tree);
 
-    script.accept(WalkingVisitor.create(new IdentifierWalker()));
+    SymbolTable symbolTable = SymbolTable.create();
+    symbolTable.upsert(script);
   }
 
   /**
@@ -81,13 +83,6 @@ public class ScriptFactoryTest {
                 "Encountered syntax error on line %d at char %d: %s",
                 line, charPositionInLine, e.getMessage()));
       }
-    }
-  }
-
-  private static class IdentifierWalker extends WalkingVisitor.Walker {
-    @Override
-    protected void touch(Identifier identifier) {
-      System.out.println(identifier.value());
     }
   }
 }

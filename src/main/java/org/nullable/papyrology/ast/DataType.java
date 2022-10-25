@@ -2,6 +2,8 @@ package org.nullable.papyrology.ast;
 
 /** The five basic types non-array types in Papyrus. */
 public enum DataType {
+  /** Special {@code DataType} used by {@link Function Functions} that don't have a return type. */
+  VOID(false),
   BOOL(false),
   INT(false),
   FLOAT(false),

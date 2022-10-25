@@ -14,8 +14,8 @@ public record Symbol(Type type, Identifier identifier, DataType dataType) {
     SCRIPT(false),
     STATE(false),
     EVENT(false),
-    FUNCTION(false),
-    GLOBAL_FUNCTION(false),
+    FUNCTION(true),
+    GLOBAL_FUNCTION(true),
     READ_ONLY_PROPERTY(true),
     WRITE_ONLY_PROPERTY(true),
     READ_WRITE_PROPERTY(true),
@@ -50,13 +50,13 @@ public record Symbol(Type type, Identifier identifier, DataType dataType) {
   }
 
   /** Returns a new {@link Type#FUNCTION} {@code Symbol}. */
-  public static Symbol function(Identifier identifier) {
-    return new Symbol(Type.FUNCTION, identifier, null);
+  public static Symbol function(Identifier identifier, DataType dataType) {
+    return new Symbol(Type.FUNCTION, identifier, dataType);
   }
 
   /** Returns a new {@link Type#GLOBAL_FUNCTION} {@code Symbol}. */
-  public static Symbol globalFunction(Identifier identifier) {
-    return new Symbol(Type.GLOBAL_FUNCTION, identifier, null);
+  public static Symbol globalFunction(Identifier identifier, DataType dataType) {
+    return new Symbol(Type.GLOBAL_FUNCTION, identifier, dataType);
   }
 
   /** Returns a new {@link Type#READ_ONLY_PROPERTY} {@code Symbol}. */

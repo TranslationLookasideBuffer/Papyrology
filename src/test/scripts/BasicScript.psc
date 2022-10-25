@@ -27,3 +27,7 @@ EndFunction
 Int Function Zero()
   return Test()[0]
 EndFunction
+
+Function Void()
+  return
+EndFunction
