@@ -30,9 +30,6 @@ public record State(
       throw new SyntaxException(sourceReference, "Cannot define global Functions within a State.");
     }
     return new State(
-       sourceReference,
-        Identifier.create(ctx.ID()),
-        invokables,
-        ctx.K_AUTO() != null);
+        sourceReference, Identifier.create(ctx.ID()), invokables, ctx.K_AUTO() != null);
   }
 }

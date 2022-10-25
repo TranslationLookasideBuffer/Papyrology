@@ -6,12 +6,18 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import org.nullable.papyrology.ast.Block;
 import org.nullable.papyrology.ast.Construct;
 import org.nullable.papyrology.ast.Event;
 import org.nullable.papyrology.ast.Function;
 import org.nullable.papyrology.ast.If;
+import org.nullable.papyrology.ast.Import;
+import org.nullable.papyrology.ast.Parameter;
+import org.nullable.papyrology.ast.Property;
 import org.nullable.papyrology.ast.Script;
+import org.nullable.papyrology.ast.ScriptVariable;
 import org.nullable.papyrology.ast.State;
+import org.nullable.papyrology.ast.Variable;
 import org.nullable.papyrology.ast.WalkingVisitor;
 
 /**
@@ -25,14 +31,13 @@ final class ScriptWalker extends WalkingVisitor.Walker {
   private final Deque<Scope> scopes;
   private Scope root;
   private boolean complete;
-  private boolean isIf;
 
   private ScriptWalker(Resolver global) {
     this.global = global;
     this.root = null;
     this.scopesByConstruct = new HashMap<>();
     this.scopes = new ArrayDeque<>();
-    this.isIf = false;
+    this.isAnonymousBlock = false;
   }
 
   /** Returns a new {@code ScriptWalker} ready to walk a {@link Script}. */
@@ -43,9 +48,7 @@ final class ScriptWalker extends WalkingVisitor.Walker {
   @Override
   protected void enter(Script script) {
     checkState(root == null, "A ScriptWalker can only be used once.");
-    Scope scope =
-        Scope.create(
-            global, Symbol.createGlobal(Symbol.Type.SCRIPT, script.header().scriptIdentifier()));
+    Scope scope = Scope.create(global, Symbol.script(script.header().scriptIdentifier()));
     scopes.push(scope);
   }
 
@@ -57,8 +60,33 @@ final class ScriptWalker extends WalkingVisitor.Walker {
   }
 
   @Override
+  protected void enter(Import importStatement) {
+    scopes.peek().insert(Symbol.script(importStatement.importedScriptIdentifier()));
+  }
+
+  @Override
+  protected void enter(ScriptVariable scriptVariable) {
+    scopes
+        .peek()
+        .insert(Symbol.variable(scriptVariable.identifier(), scriptVariable.type().dataType()));
+  }
+
+  @Override
+  protected void enter(Property property) {
+    Symbol symbol;
+    if (property.isAuto() || (property.getFunction().isPresent() && property.setFunction().isPresent())) {
+      symbol = Symbol.readWriteProperty(property.identifier(), property.type().dataType());
+    } else if (property.isAutoReadOnly() || property.getFunction().isPresent()) {
+      symbol = Symbol.readOnlyProperty(property.identifier(), property.type().dataType());
+    } else {
+      symbol = Symbol.writeOnlyProperty(property.identifier(), property.type().dataType());
+    }
+    scopes.peek().insert(symbol);
+  }
+
+  @Override
   protected void enter(State state) {
-    Symbol symbol = Symbol.createLocal(Symbol.Type.STATE, state.identifier());
+    Symbol symbol = Symbol.state(state.identifier());
     scopes.peek().insert(symbol);
     Scope scope = Scope.create(scopes.peek(), symbol);
     scopes.push(scope);
@@ -73,7 +101,7 @@ final class ScriptWalker extends WalkingVisitor.Walker {
 
   @Override
   protected void enter(Event event) {
-    Symbol symbol = Symbol.createLocal(Symbol.Type.EVENT, event.identifier());
+    Symbol symbol = Symbol.event(event.identifier());
     scopes.peek().insert(symbol);
     Scope scope = Scope.create(scopes.peek(), symbol);
     scopes.push(scope);
@@ -89,7 +117,10 @@ final class ScriptWalker extends WalkingVisitor.Walker {
 
   @Override
   protected void enter(Function function) {
-    Symbol symbol = Symbol.create(Symbol.Type.FUNCTION, function.identifier(), function.isGlobal());
+    Symbol symbol =
+        function.isGlobal()
+            ? Symbol.globalFunction(function.identifier())
+            : Symbol.function(function.identifier());
     scopes.peek().insert(symbol);
     Scope scope = Scope.create(scopes.peek(), symbol);
     scopes.push(scope);
@@ -104,13 +135,30 @@ final class ScriptWalker extends WalkingVisitor.Walker {
   }
 
   @Override
-  protected void enter(If ifStatement) {
-    isIf = true;
+  protected void enter(Block block) {
+    scopes.push(Scope.create(scopes.peek()));
   }
 
   @Override
-  protected void exit(If ifStatement) {
-    isIf = false;
+  protected void exit(Block block) {
+    Scope scope = scopes.pop();
+    scope.lock();
+    scopesByConstruct.put(block, scope);
+  }
+
+  @Override
+  protected void enter(Variable variable) {
+    scopes.peek().insert(Symbol.variable(variable.identifier(), variable.type().dataType()));
+  }
+
+  @Override
+  protected void enter(Variable variable) {
+    scopes.peek().insert(Symbol.variable(variable.identifier(), variable.type().dataType()));
+  }
+
+  @Override
+  protected void enter(Parameter parameter) {
+    scopes.peek().insert(Symbol.variable(parameter.identifier(), parameter.type().dataType()));
   }
 
   public Map<Construct, Scope> scopes() {

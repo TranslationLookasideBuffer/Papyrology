@@ -33,6 +33,7 @@ final class Scope implements Resolver {
           .put(Symbol.Type.SCRIPT, Type.SCRIPT)
           .put(Symbol.Type.STATE, Type.STATE)
           .put(Symbol.Type.FUNCTION, Type.FUNCTION)
+          .put(Symbol.Type.GLOBAL_FUNCTION, Type.FUNCTION)
           .put(Symbol.Type.EVENT, Type.EVENT)
           .buildOrThrow();
 
@@ -114,7 +115,7 @@ final class Scope implements Resolver {
       return ImmutableSet.of();
     }
     return symbols.values().stream()
-        .filter(s -> s.isGlobal())
+        .filter(s -> s.type().equals(Symbol.Type.GLOBAL_FUNCTION))
         .collect(ImmutableSet.toImmutableSet());
   }
 
