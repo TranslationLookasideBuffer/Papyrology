@@ -3,9 +3,9 @@ load("@bazel_tools//tools/jdk:default_java_toolchain.bzl", "BASE_JDK9_JVM_OPTS",
 default_java_toolchain(
     name = "repository_default_toolchain",
     configuration = DEFAULT_TOOLCHAIN_CONFIGURATION,
-    java_runtime = "@bazel_tools//tools/jdk:remotejdk_17",
+    java_runtime = "@bazel_tools//tools/jdk:remotejdk_19",
     javacopts = DEFAULT_JAVACOPTS + ["--enable-preview"],
     jvm_opts = BASE_JDK9_JVM_OPTS + ["--enable-preview"],
-    source_version = "17",
-    target_version = "17",
+    source_version = "19",
+    target_version = "19",
 )
