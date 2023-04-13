@@ -13,7 +13,7 @@ import org.nullable.papyrology.source.SourceReference;
 public record StringLiteral(SourceReference sourceReference, String value) implements Literal {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

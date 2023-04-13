@@ -156,11 +156,11 @@ public final class SymbolTable {
     }
   }
 
-  private static final String normalize(Identifier identifier) {
+  private static String normalize(Identifier identifier) {
     return normalize(identifier.value());
   }
 
-  private static final String normalize(String identifier) {
+  private static String normalize(String identifier) {
     return identifier.toUpperCase(Locale.US);
   }
 }

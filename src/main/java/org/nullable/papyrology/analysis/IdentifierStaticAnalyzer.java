@@ -11,7 +11,7 @@ import org.nullable.papyrology.ast.Script;
 /** A {@link StaticAnalyzer} that resolves and validates identifiers. */
 public class IdentifierStaticAnalyzer implements StaticAnalyzer {
 
-  private IdentifierResolver resolver;
+  private final IdentifierResolver resolver;
 
   private IdentifierStaticAnalyzer(IdentifierResolver resolver) {
     this.resolver = resolver;

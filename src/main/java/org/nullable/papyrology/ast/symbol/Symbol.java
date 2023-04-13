@@ -23,7 +23,7 @@ public record Symbol(Type type, Identifier identifier, DataType dataType) {
 
     private final boolean hasDataType;
 
-    private Type(boolean hasDataType) {
+    Type(boolean hasDataType) {
       this.hasDataType = hasDataType;
     }
   }

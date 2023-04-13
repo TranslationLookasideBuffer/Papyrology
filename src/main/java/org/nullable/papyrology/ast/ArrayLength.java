@@ -10,7 +10,7 @@ public record ArrayLength(SourceReference sourceReference, Expression arrayExpre
     implements Expression {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

@@ -17,7 +17,7 @@ public record ScriptVariable(
     implements Declaration {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

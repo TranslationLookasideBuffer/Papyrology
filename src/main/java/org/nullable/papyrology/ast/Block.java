@@ -15,7 +15,7 @@ public record Block(SourceReference sourceReference, ImmutableList<Statement> bo
     implements Construct {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

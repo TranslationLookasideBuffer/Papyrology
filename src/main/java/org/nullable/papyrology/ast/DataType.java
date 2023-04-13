@@ -17,7 +17,7 @@ public enum DataType {
 
   private final boolean isArray;
 
-  private DataType(boolean isArray) {
+  DataType(boolean isArray) {
     this.isArray = isArray;
   }
 

@@ -22,7 +22,7 @@ public record IntegerLiteral(SourceReference sourceReference, int value, boolean
     implements Literal {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 
@@ -58,5 +58,5 @@ public record IntegerLiteral(SourceReference sourceReference, int value, boolean
   private static final BigInteger MAX_VALUE = BigInteger.valueOf(Integer.MAX_VALUE);
   private static final BigInteger MIN_VALUE = BigInteger.valueOf(Integer.MIN_VALUE);
 
-  private static record ParsedValue(int value, boolean isOutOfRange) {}
+  private record ParsedValue(int value, boolean isOutOfRange) {}
 }

@@ -10,7 +10,7 @@ public record Cast(SourceReference sourceReference, Type type, Expression expres
     implements Expression {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

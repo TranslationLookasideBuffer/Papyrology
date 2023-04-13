@@ -12,7 +12,7 @@ public record Import(SourceReference sourceReference, Identifier importedScriptI
     implements Declaration {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

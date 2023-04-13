@@ -14,19 +14,19 @@ import org.nullable.papyrology.source.SourceReference;
 public record Identifier(SourceReference sourceReference, String value) implements Expression {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 
   /** Returns whether or not this {@link Identifier} refers to the same entity as the given one. */
-  public final boolean isEquivalent(Identifier other) {
+  public boolean isEquivalent(Identifier other) {
     return value().toUpperCase(Locale.US).equals(other.value().toUpperCase(Locale.US));
   }
 
   /**
    * Returns whether or not this {@link Identifier} refers to the same entity as the given literal.
    */
-  public final boolean isEquivalent(String other) {
+  public boolean isEquivalent(String other) {
     return value().toUpperCase(Locale.US).equals(other.toUpperCase(Locale.US));
   }
 

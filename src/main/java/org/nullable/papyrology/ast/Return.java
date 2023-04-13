@@ -12,7 +12,7 @@ public record Return(SourceReference sourceReference, Optional<Expression> value
     implements Statement {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

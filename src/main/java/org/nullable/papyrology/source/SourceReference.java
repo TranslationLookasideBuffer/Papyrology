@@ -19,7 +19,7 @@ public final class SourceReference {
   }
 
   /** Returns a new {@code SourceReference} based on the given {@link TerminalNode}. */
-  public static final SourceReference create(TerminalNode node) {
+  public static SourceReference create(TerminalNode node) {
     return new SourceReference(
         node.getSymbol().getText(),
         node.getSymbol().getLine(),
@@ -27,7 +27,7 @@ public final class SourceReference {
   }
 
   /** Returns a new {@code SourceReference} based on the given {@link ParserRuleContext}. */
-  public static final SourceReference create(ParserRuleContext ctx) {
+  public static SourceReference create(ParserRuleContext ctx) {
     return new SourceReference(
         ctx.getText(), ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine());
   }

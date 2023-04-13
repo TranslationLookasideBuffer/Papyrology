@@ -22,7 +22,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(ArrayAccess arrayAccess) {
+  public void visit(ArrayAccess arrayAccess) {
     walker.enter(arrayAccess);
     visit(arrayAccess.arrayExpression());
     visit(arrayAccess.indexExpression());
@@ -30,7 +30,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(ArrayInitialization arrayInitialization) {
+  public void visit(ArrayInitialization arrayInitialization) {
     walker.enter(arrayInitialization);
     visit(arrayInitialization.type());
     visit(arrayInitialization.size());
@@ -38,14 +38,14 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(ArrayLength arrayLength) {
+  public void visit(ArrayLength arrayLength) {
     walker.enter(arrayLength);
     visit(arrayLength.arrayExpression());
     walker.exit(arrayLength);
   }
 
   @Override
-  public final void visit(Assignment assignment) {
+  public void visit(Assignment assignment) {
     walker.enter(assignment);
     switch (assignment.assignee().type()) {
       case IDENTIFIER:
@@ -63,7 +63,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(BinaryOperation binaryOperation) {
+  public void visit(BinaryOperation binaryOperation) {
     walker.enter(binaryOperation);
     visit(binaryOperation.leftExpression());
     visit(binaryOperation.rightExpression());
@@ -71,19 +71,19 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Block block) {
+  public void visit(Block block) {
     walker.enter(block);
     block.bodyStatements().forEach(this::visit);
     walker.exit(block);
   }
 
   @Override
-  public final void visit(BooleanLiteral booleanLiteral) {
+  public void visit(BooleanLiteral booleanLiteral) {
     walker.touch(booleanLiteral);
   }
 
   @Override
-  public final void visit(CallParameter callParameter) {
+  public void visit(CallParameter callParameter) {
     walker.enter(callParameter);
     callParameter.identifier().ifPresent(this::visit);
     visit(callParameter.expression());
@@ -91,7 +91,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Cast cast) {
+  public void visit(Cast cast) {
     walker.enter(cast);
     visit(cast.type());
     visit(cast.expression());
@@ -99,7 +99,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(DotAccess dotAccess) {
+  public void visit(DotAccess dotAccess) {
     walker.enter(dotAccess);
     visit(dotAccess.referenceExpression());
     visit(dotAccess.identifier());
@@ -107,7 +107,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Event event) {
+  public void visit(Event event) {
     walker.enter(event);
     visit(event.identifier());
     event.parameters().forEach(this::visit);
@@ -116,12 +116,12 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(FloatLiteral floatLiteral) {
+  public void visit(FloatLiteral floatLiteral) {
     walker.touch(floatLiteral);
   }
 
   @Override
-  public final void visit(Function function) {
+  public void visit(Function function) {
     walker.enter(function);
     visit(function.identifier());
     function.returnType().ifPresent(this::visit);
@@ -131,7 +131,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(FunctionCall functionCall) {
+  public void visit(FunctionCall functionCall) {
     walker.enter(functionCall);
     functionCall.referenceExpression().ifPresent(this::visit);
     visit(functionCall.identifier());
@@ -140,7 +140,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Header header) {
+  public void visit(Header header) {
     walker.enter(header);
     visit(header.scriptIdentifier());
     header.parentScriptIdentifier().ifPresent(this::visit);
@@ -148,12 +148,12 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Identifier identifier) {
+  public void visit(Identifier identifier) {
     walker.touch(identifier);
   }
 
   @Override
-  public final void visit(If ifStatement) {
+  public void visit(If ifStatement) {
     walker.enter(ifStatement);
     ifStatement
         .conditionalBlocks()
@@ -167,24 +167,24 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Import importDeclaration) {
+  public void visit(Import importDeclaration) {
     walker.enter(importDeclaration);
     visit(importDeclaration.importedScriptIdentifier());
     walker.exit(importDeclaration);
   }
 
   @Override
-  public final void visit(IntegerLiteral integerLiteral) {
+  public void visit(IntegerLiteral integerLiteral) {
     walker.touch(integerLiteral);
   }
 
   @Override
-  public final void visit(ObjectLiteral objectLiteral) {
+  public void visit(ObjectLiteral objectLiteral) {
     walker.touch(objectLiteral);
   }
 
   @Override
-  public final void visit(Parameter parameter) {
+  public void visit(Parameter parameter) {
     walker.enter(parameter);
     visit(parameter.type());
     visit(parameter.identifier());
@@ -193,14 +193,14 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Parenthetical parenthetical) {
+  public void visit(Parenthetical parenthetical) {
     walker.enter(parenthetical);
     visit(parenthetical.expression());
     walker.exit(parenthetical);
   }
 
   @Override
-  public final void visit(Property property) {
+  public void visit(Property property) {
     walker.enter(property);
     visit(property.type());
     visit(property.identifier());
@@ -211,14 +211,14 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(Return returnStatement) {
+  public void visit(Return returnStatement) {
     walker.enter(returnStatement);
     returnStatement.valueExpression().ifPresent(this::visit);
     walker.exit(returnStatement);
   }
 
   @Override
-  public final void visit(Script script) {
+  public void visit(Script script) {
     walker.enter(script);
     visit(script.header());
     script.declarations().forEach(this::visit);
@@ -226,7 +226,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(ScriptVariable scriptVariable) {
+  public void visit(ScriptVariable scriptVariable) {
     walker.enter(scriptVariable);
     visit(scriptVariable.type());
     visit(scriptVariable.identifier());
@@ -235,7 +235,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(State state) {
+  public void visit(State state) {
     walker.enter(state);
     visit(state.identifier());
     state.invokables().forEach(this::visit);
@@ -243,26 +243,26 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(StringLiteral stringLiteral) {
+  public void visit(StringLiteral stringLiteral) {
     walker.touch(stringLiteral);
   }
 
   @Override
-  public final void visit(Type type) {
+  public void visit(Type type) {
     walker.enter(type);
     type.identifier().ifPresent(this::visit);
     walker.exit(type);
   }
 
   @Override
-  public final void visit(UnaryOperation unaryOperation) {
+  public void visit(UnaryOperation unaryOperation) {
     walker.enter(unaryOperation);
     visit(unaryOperation.expression());
     walker.exit(unaryOperation);
   }
 
   @Override
-  public final void visit(Variable variable) {
+  public void visit(Variable variable) {
     walker.enter(variable);
     visit(variable.type());
     visit(variable.identifier());
@@ -271,7 +271,7 @@ public final class WalkingVisitor implements Visitor {
   }
 
   @Override
-  public final void visit(While whileStatement) {
+  public void visit(While whileStatement) {
     walker.enter(whileStatement);
     visit(whileStatement.body());
     walker.exit(whileStatement);
@@ -279,7 +279,7 @@ public final class WalkingVisitor implements Visitor {
 
   // The following methods are needed to satisfy the compiler, but are never actually invoked.
 
-  private final void visit(Literal literal) {
+  private void visit(Literal literal) {
     switch (literal) {
       case BooleanLiteral b -> visit(b);
       case FloatLiteral f -> visit(f);
@@ -293,7 +293,7 @@ public final class WalkingVisitor implements Visitor {
     }
   }
 
-  private final void visit(Declaration declaration) {
+  private void visit(Declaration declaration) {
     switch (declaration) {
       case Event e -> visit(e);
       case Function f -> visit(f);
@@ -308,7 +308,7 @@ public final class WalkingVisitor implements Visitor {
     }
   }
 
-  private final void visit(Expression expression) {
+  private void visit(Expression expression) {
     switch (expression) {
       case ArrayAccess a -> visit(a);
       case ArrayInitialization i -> visit(i);
@@ -328,7 +328,7 @@ public final class WalkingVisitor implements Visitor {
     }
   }
 
-  private final void visit(Invokable invokable) {
+  private void visit(Invokable invokable) {
     switch (invokable) {
       case Event e -> visit(e);
       case Function f -> visit(f);
@@ -339,7 +339,7 @@ public final class WalkingVisitor implements Visitor {
     }
   }
 
-  private final void visit(Statement statement) {
+  private void visit(Statement statement) {
     switch (statement) {
       case Assignment a -> visit(a);
       case Expression e -> visit(e);

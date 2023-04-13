@@ -27,7 +27,7 @@ final class Scope implements Resolver {
     STATE,
     FUNCTION,
     EVENT,
-    ANONYMOUS_BLOCK;
+    ANONYMOUS_BLOCK
   }
 
   private static final ImmutableMap<Symbol.Type, Type> TO_SCOPE_TYPE =
@@ -150,7 +150,7 @@ final class Scope implements Resolver {
     symbols.put(key, symbol);
   }
 
-  private static final String toKey(Identifier identifier) {
+  private static String toKey(Identifier identifier) {
     return identifier.value().toUpperCase(Locale.US);
   }
 

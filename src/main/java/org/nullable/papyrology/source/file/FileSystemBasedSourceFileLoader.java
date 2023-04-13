@@ -51,7 +51,7 @@ public final class FileSystemBasedSourceFileLoader implements SourceFileLoader {
   }
 
   @Override
-  public final SourceFile load(String identifier) {
+  public SourceFile load(String identifier) {
     Path path = identifiersToPaths.get(identifier.toUpperCase(Locale.US));
     if (path == null) {
       throw new SourceFileLoadException("Could not locate a script with name \"%s\"", identifier);

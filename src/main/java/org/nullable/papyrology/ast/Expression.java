@@ -32,8 +32,7 @@ public interface Expression extends Statement {
     if (ctx instanceof LocalFunctionCallContext) {
       return FunctionCall.create((LocalFunctionCallContext) ctx);
     }
-    if (ctx instanceof DotAccessOrFunctionCallContext) {
-      DotAccessOrFunctionCallContext orCtx = (DotAccessOrFunctionCallContext) ctx;
+    if (ctx instanceof DotAccessOrFunctionCallContext orCtx) {
       return orCtx.callParameters() != null ? FunctionCall.create(orCtx) : DotAccess.create(orCtx);
     }
     if (ctx instanceof ArrayLengthContext) {

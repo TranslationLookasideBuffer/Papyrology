@@ -33,14 +33,12 @@ public class FileSystemBasedSourceFileLoaderTest {
   public Configuration config;
 
   private FileSystemBasedSourceFileLoader loader;
-  private FileSystem fs;
-  private Path directory;
   private Path scriptPath;
 
   @Before
   public void setUp() throws IOException {
-    fs = Jimfs.newFileSystem(config);
-    directory = fs.getPath("test");
+    FileSystem fs = Jimfs.newFileSystem(config);
+    Path directory = fs.getPath("test");
     Files.createDirectory(directory);
     // Create a script in the directory we're loading from.
     scriptPath = directory.resolve(SCRIPT_ID + ".psc");

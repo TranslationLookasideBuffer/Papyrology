@@ -15,7 +15,7 @@ public interface StaticAnalyzer {
 
   /** An issue identified by a static analyzer. */
   @AutoValue
-  public abstract class Issue {
+  abstract class Issue {
 
     /** Identifies the "class" of this {@code Issue}. */
     public enum Category {

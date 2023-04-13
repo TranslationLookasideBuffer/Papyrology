@@ -28,7 +28,7 @@ public record ObjectLiteral(SourceReference sourceReference, Reference value) im
   }
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

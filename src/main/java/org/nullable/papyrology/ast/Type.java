@@ -17,7 +17,7 @@ public record Type(
     implements Construct {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

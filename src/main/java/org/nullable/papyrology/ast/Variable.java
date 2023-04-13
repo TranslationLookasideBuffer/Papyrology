@@ -16,7 +16,7 @@ public record Variable(
     implements Statement {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 

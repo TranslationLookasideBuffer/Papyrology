@@ -12,7 +12,7 @@ public record ArrayAccess(
     implements Expression {
 
   @Override
-  public final void accept(Visitor visitor) {
+  public void accept(Visitor visitor) {
     visitor.visit(this);
   }
 
