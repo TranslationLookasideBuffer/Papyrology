@@ -1,4 +1,8 @@
-build --java_language_version=19
-build --java_runtime_version=remotejdk_19
-build --tool_java_language_version=19
-build --tool_java_runtime_version=remotejdk_19
+build --java_language_version=21
+build --java_runtime_version=remotejdk_21
+build --tool_java_language_version=21
+build --tool_java_runtime_version=remotejdk_21
+build:legacy --java_language_version=11
+build:legacy --java_runtime_version=remotejdk_11
+build:legacy --tool_java_language_version=11
+build:legacy --tool_java_runtime_version=remotejdk_11

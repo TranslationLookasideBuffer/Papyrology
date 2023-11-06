@@ -61,5 +61,5 @@ java_library(
 
 java_library(
     name = "antlr",
-    exports = ["@antlr4_runtime//jar"],
+    exports = ["@antlr//jar"],
 )
