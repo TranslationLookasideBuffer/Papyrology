@@ -3,19 +3,6 @@ register_toolchains("//:repository_default_toolchain_definition")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_jar")
 
 http_archive(
-    name = "io_bazel_stardoc",
-    sha256 = "c9794dcc8026a30ff67cf7cf91ebe245ca294b20b071845d12c192afe243ad72",
-    urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/stardoc/releases/download/0.5.0/stardoc-0.5.0.tar.gz",
-        "https://github.com/bazelbuild/stardoc/releases/download/0.5.0/stardoc-0.5.0.tar.gz",
-    ],
-)
-
-load("@io_bazel_stardoc//:setup.bzl", "stardoc_repositories")
-
-stardoc_repositories()
-
-http_archive(
     name = "rules_java",
     sha256 = "e81e9deaae0d9d99ef3dd5f6c1b32338447fe16d5564155531ea4eb7ef38854b",
     url = "https://github.com/bazelbuild/rules_java/releases/download/7.0.6/rules_java-7.0.6.tar.gz",
